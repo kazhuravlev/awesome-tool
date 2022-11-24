@@ -1,8 +1,11 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/kazhuravlev/awesome-tool/internal/errorsh"
 	"github.com/kazhuravlev/awesome-tool/internal/source"
+	"github.com/kazhuravlev/awesome-tool/internal/sum"
 )
 
 func main() {
@@ -22,5 +25,14 @@ func run() error {
 		return errorsh.Wrap(err, "validate source object")
 	}
 
+	for _, link := range sourceObj.Links {
+		out, err := sum.GatherFacts(link)
+		if err != nil {
+			return err
+		}
+
+		fmt.Println(*out)
+
+	}
 	return nil
 }

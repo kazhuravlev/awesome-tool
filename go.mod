@@ -5,6 +5,7 @@ go 1.19
 require (
 	github.com/goccy/go-yaml v1.9.6
 	github.com/kazhuravlev/just v0.55.2
+	github.com/shopspring/decimal v1.3.1
 )
 
 require (
