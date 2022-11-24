@@ -1,10 +1,43 @@
 package sum
 
 import (
-	"net/url"
+	"errors"
+	"fmt"
 
 	"github.com/kazhuravlev/awesome-tool/internal/source"
+	"github.com/kazhuravlev/just"
 )
+
+// gExtractors contains all available etractors. This is like a registry of all
+// extractors.
+var gExtractors = make(map[FactName]FactExtractor)
+
+// gExtractorsDeps contains fact dependencies.
+var gExtractorsDeps = make(map[FactName][]FactName)
+
+// RegisterExtractor will add extractor in global registry.
+func RegisterExtractor(extractor FactExtractor) error {
+	if just.MapContainsKey(gExtractors, extractor.Name()) {
+		return errors.New("fact extractor already exists")
+	}
+
+	for _, dep := range extractor.Deps() {
+		if !just.MapContainsKey(gExtractors, dep) {
+			return fmt.Errorf("extractor '%s' not found", dep)
+		}
+	}
+
+	gExtractors[extractor.Name()] = extractor
+	gExtractorsDeps[extractor.Name()] = extractor.Deps()
+
+	return nil
+}
+
+func MustRegisterExtractor(extractor FactExtractor) {
+	if err := RegisterExtractor(extractor); err != nil {
+		panic("register extractor: " + err.Error())
+	}
+}
 
 func GatherFacts(link source.Link) (*Link, error) {
 	resLink := Link{
@@ -12,31 +45,18 @@ func GatherFacts(link source.Link) (*Link, error) {
 		Facts:   LinkFacts{},
 	}
 
-	extractors := []factExtractor{}
-	for i := range extractors {
-		extractors[i](&resLink)
+	for i := range gExtractors {
+		gExtractors[i].Extract(&resLink)
 	}
 
 	return &resLink, nil
 }
 
-type factExtractor func(*Link)
-
-func extractUrl(link *Link) {
-	u, err := url.Parse(link.SrcLink.URL)
-	if err != nil {
-		return
-	}
-
-	link.Facts.Url.Data = u
-}
-
-func extractGithub(link *Link) {
-	if !link.Facts.Url.HasData {
-		return
-	}
-
-	u := link.Facts.Url.Data
-
-	link.Facts.Url.Data = u
+type FactExtractor interface {
+	// Name of extractor
+	Name() FactName
+	// Deps of this extractor
+	Deps() []FactName
+	// Implementation of extractor
+	Extract(*Link)
 }

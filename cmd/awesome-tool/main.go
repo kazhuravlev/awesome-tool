@@ -15,6 +15,9 @@ func main() {
 }
 
 func run() error {
+	sum.MustRegisterExtractor(sum.URL{})
+	sum.MustRegisterExtractor(sum.GitHub{})
+
 	const filename = "./examples/basic/data.yaml"
 	sourceObj, err := source.ParseFile(filename)
 	if err != nil {
