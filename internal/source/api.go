@@ -30,6 +30,10 @@ func Validate(obj Source) error {
 			return fmt.Errorf("rule '%s' is duplicated", rule.Name)
 		}
 
+		if len(rule.Checks) == 0 {
+			return fmt.Errorf("rule '%s' has no checks", rule.Name)
+		}
+
 		// FIXME: check the check names and args
 
 		rulesMap[rule.Name] = struct{}{}
