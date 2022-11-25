@@ -16,7 +16,7 @@ rules:
         args:
           - 10
 
-# THis rules will be enabled by default for all links
+# This rules will be enabled by default for all links
 global-rules-enabled: 
   - http-200
   - min-github-stars
