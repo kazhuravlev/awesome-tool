@@ -24,14 +24,9 @@ type Link struct {
 }
 
 type LinkFacts struct {
-	Url      Fact[*url.URL]
-	Response Fact[ResponseData]
-	Github   Fact[struct{}]
-}
-
-type Fact[T any] struct {
-	HasData bool
-	Data    T
+	Url      *url.URL
+	Response ResponseData
+	Github   struct{}
 }
 
 type ResponseData struct {

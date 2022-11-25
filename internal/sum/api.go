@@ -12,6 +12,10 @@ import (
 // extractors.
 var gExtractors = make(map[FactName]FactExtractor)
 
+// gExtractorsOrdering contains order of fact etractors. This is executing
+// order.
+var gExtractorsOrdering []FactName
+
 // gExtractorsDeps contains fact dependencies.
 var gExtractorsDeps = make(map[FactName][]FactName)
 
@@ -29,6 +33,7 @@ func RegisterExtractor(extractor FactExtractor) error {
 
 	gExtractors[extractor.Name()] = extractor
 	gExtractorsDeps[extractor.Name()] = extractor.Deps()
+	gExtractorsOrdering = append(gExtractorsOrdering, extractor.Name())
 
 	return nil
 }
@@ -45,8 +50,18 @@ func GatherFacts(link source.Link) (*Link, error) {
 		Facts:   LinkFacts{},
 	}
 
-	for i := range gExtractors {
-		gExtractors[i].Extract(&resLink)
+	readyMap := make(map[FactName]bool, len(gExtractors))
+ExtractCycle:
+	for _, factName := range gExtractorsOrdering {
+		extractor := gExtractors[factName]
+
+		for _, dep := range extractor.Deps() {
+			if !readyMap[dep] {
+				continue ExtractCycle
+			}
+		}
+
+		readyMap[extractor.Name()] = extractor.Extract(&resLink)
 	}
 
 	return &resLink, nil
@@ -58,5 +73,5 @@ type FactExtractor interface {
 	// Deps of this extractor
 	Deps() []FactName
 	// Implementation of extractor
-	Extract(*Link)
+	Extract(*Link) bool
 }

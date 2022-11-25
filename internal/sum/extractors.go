@@ -18,13 +18,14 @@ func (URL) Deps() []FactName {
 	return nil
 }
 
-func (URL) Extract(link *Link) {
+func (URL) Extract(link *Link) bool {
 	u, err := url.Parse(link.SrcLink.URL)
 	if err != nil {
-		return
+		return false
 	}
 
-	link.Facts.Url.Data = u
+	link.Facts.Url = u
+	return true
 }
 
 type GitHub struct {
@@ -39,14 +40,11 @@ func (GitHub) Deps() []FactName {
 	return []FactName{"url"}
 }
 
-func (GitHub) Extract(link *Link) {
-	if !link.Facts.Url.HasData {
-		return
-	}
+func (GitHub) Extract(link *Link) bool {
+	u := link.Facts.Url
 
-	u := link.Facts.Url.Data
-
-	link.Facts.Url.Data = u
+	link.Facts.Url = u
+	return true
 }
 
 type Response struct {
@@ -62,7 +60,7 @@ func (Response) Deps() []FactName {
 	return []FactName{"url"}
 }
 
-func (r *Response) Extract(link *Link) {
+func (r *Response) Extract(link *Link) bool {
 	ctx := context.Background()
 	if r.Timeout != 0 {
 		var cancel context.CancelFunc
@@ -71,32 +69,30 @@ func (r *Response) Extract(link *Link) {
 	}
 
 	start := time.Now()
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, link.Facts.Url.Data.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, link.Facts.Url.String(), nil)
 	if err != nil {
-		return
+		return false
 	}
 
 	resp, err := r.Client.Do(req)
 	if err != nil {
-		return
+		return false
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return
+		return false
 	}
 
 	duration := time.Since(start)
 
-	link.Facts.Response = Fact[ResponseData]{
-		HasData: true,
-		Data: ResponseData{
-			Protocol:   [2]int{resp.ProtoMajor, resp.ProtoMinor},
-			Duration:   duration,
-			StatusCode: resp.StatusCode,
-			Body:       body,
-			Headers:    resp.Header,
-		},
+	link.Facts.Response = ResponseData{
+		Protocol:   [2]int{resp.ProtoMajor, resp.ProtoMinor},
+		Duration:   duration,
+		StatusCode: resp.StatusCode,
+		Body:       body,
+		Headers:    resp.Header,
 	}
+	return true
 }
