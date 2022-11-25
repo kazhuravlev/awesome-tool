@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+	"time"
 
 	"github.com/kazhuravlev/awesome-tool/internal/errorsh"
 	"github.com/kazhuravlev/awesome-tool/internal/source"
@@ -16,6 +18,10 @@ func main() {
 
 func run() error {
 	sum.MustRegisterExtractor(sum.URL{})
+	sum.MustRegisterExtractor(&sum.Response{
+		Client:  http.DefaultClient,
+		Timeout: time.Second,
+	})
 	sum.MustRegisterExtractor(sum.GitHub{})
 
 	const filename = "./examples/basic/data.yaml"
