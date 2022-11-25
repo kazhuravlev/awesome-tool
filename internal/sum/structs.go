@@ -37,3 +37,12 @@ type ResponseData struct {
 	Body       []byte
 	Headers    map[string][]string
 }
+
+type FactExtractor interface {
+	// Name of extractor
+	Name() FactName
+	// Deps of this extractor
+	Deps() []FactName
+	// Implementation of extractor
+	Extract(*Link) bool
+}

@@ -16,9 +16,6 @@ var gExtractors = make(map[FactName]FactExtractor)
 // order.
 var gExtractorsOrdering []FactName
 
-// gExtractorsDeps contains fact dependencies.
-var gExtractorsDeps = make(map[FactName][]FactName)
-
 // RegisterExtractor will add extractor in global registry.
 func RegisterExtractor(extractor FactExtractor) error {
 	if just.MapContainsKey(gExtractors, extractor.Name()) {
@@ -32,7 +29,6 @@ func RegisterExtractor(extractor FactExtractor) error {
 	}
 
 	gExtractors[extractor.Name()] = extractor
-	gExtractorsDeps[extractor.Name()] = extractor.Deps()
 	gExtractorsOrdering = append(gExtractorsOrdering, extractor.Name())
 
 	return nil
@@ -65,13 +61,4 @@ ExtractCycle:
 	}
 
 	return &resLink, nil
-}
-
-type FactExtractor interface {
-	// Name of extractor
-	Name() FactName
-	// Deps of this extractor
-	Deps() []FactName
-	// Implementation of extractor
-	Extract(*Link) bool
 }
