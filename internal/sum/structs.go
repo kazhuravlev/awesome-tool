@@ -2,6 +2,7 @@ package sum
 
 import (
 	"net/url"
+	"time"
 
 	"github.com/kazhuravlev/awesome-tool/internal/source"
 )
@@ -24,12 +25,20 @@ type Link struct {
 
 type LinkFacts struct {
 	Url      Fact[*url.URL]
-	Response Fact[struct{}]
+	Response Fact[ResponseData]
 	Github   Fact[struct{}]
-	Gitlab   Fact[struct{}]
 }
 
 type Fact[T any] struct {
 	HasData bool
 	Data    T
+}
+
+type ResponseData struct {
+	// {2, 0} means http 2/0
+	Protocol   [2]int
+	Duration   time.Duration
+	StatusCode int
+	Body       []byte
+	Headers    map[string][]string
 }
