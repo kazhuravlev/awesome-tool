@@ -22,6 +22,10 @@ type Sum struct {
 type Link struct {
 	SrcLink source.Link
 	Facts   LinkFacts
+	// NOTE: This is a duplicate for each link. It is a result set of rules,
+	//   which will applied to exact this link after all enable/disable/ignore
+	//   rules.
+	Rules []source.Rule
 }
 
 type LinkFacts struct {
@@ -50,5 +54,5 @@ type FactExtractor interface {
 	// Deps of this extractor
 	Deps() []FactName
 	// Extract implements of extractor
-	Extract(context.Context, *Link) (bool, error)
+	Extract(context.Context, source.Link, *LinkFacts) (bool, error)
 }

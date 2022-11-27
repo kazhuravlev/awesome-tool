@@ -2,6 +2,7 @@ package sum
 
 import (
 	"context"
+	"github.com/kazhuravlev/awesome-tool/internal/source"
 	"io"
 	"net/http"
 	"net/url"
@@ -24,13 +25,13 @@ func (URL) Deps() []FactName {
 	return nil
 }
 
-func (URL) Extract(_ context.Context, link *Link) (bool, error) {
-	u, err := url.Parse(link.SrcLink.URL)
+func (URL) Extract(_ context.Context, link source.Link, facts *LinkFacts) (bool, error) {
+	u, err := url.Parse(link.URL)
 	if err != nil {
 		return false, nil
 	}
 
-	link.Facts.Url = u
+	facts.Url = u
 	return true, nil
 }
 
@@ -46,7 +47,7 @@ func (GitHub) Deps() []FactName {
 	return []FactName{FactUrl}
 }
 
-func (GitHub) Extract(ctx context.Context, link *Link) (bool, error) {
+func (GitHub) Extract(ctx context.Context, link source.Link, facts *LinkFacts) (bool, error) {
 	// FIXME: implement
 	return true, nil
 }
@@ -64,7 +65,7 @@ func (Response) Deps() []FactName {
 	return []FactName{FactUrl}
 }
 
-func (r *Response) Extract(ctx context.Context, link *Link) (bool, error) {
+func (r *Response) Extract(ctx context.Context, link source.Link, facts *LinkFacts) (bool, error) {
 	if r.Timeout != 0 {
 		var cancel context.CancelFunc
 		ctx, cancel = context.WithTimeout(ctx, r.Timeout)
@@ -72,7 +73,7 @@ func (r *Response) Extract(ctx context.Context, link *Link) (bool, error) {
 	}
 
 	start := time.Now()
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, link.Facts.Url.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, facts.Url.String(), nil)
 	if err != nil {
 		return false, nil
 	}
@@ -90,7 +91,7 @@ func (r *Response) Extract(ctx context.Context, link *Link) (bool, error) {
 
 	duration := time.Since(start)
 
-	link.Facts.Response = ResponseData{
+	facts.Response = ResponseData{
 		Protocol:   [2]int{resp.ProtoMajor, resp.ProtoMinor},
 		Duration:   duration,
 		StatusCode: resp.StatusCode,
