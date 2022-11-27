@@ -69,8 +69,8 @@ func ParseCheck(s string) (Check, error) {
 			return nil, errorsh.Wrapf(err, "bad arguments for check '%s'", checkName)
 		}
 
-		return CheckResponseStatusEq{
-			ExpectedStatus: minimumStars,
+		return CheckGithubStarsMin{
+			MinStars: minimumStars,
 		}, nil
 	}
 }

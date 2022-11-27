@@ -50,7 +50,17 @@ func Run(ctx context.Context, filename string) error {
 		return errorsh.Wrap(err, "gather facts for source obj")
 	}
 
-	fmt.Println(sumObj)
+	for _, link := range sumObj.Links {
+		for _, rule := range link.Rules {
+			for _, checkStringRaw := range rule.Checks {
+				check := checks[checkStringRaw]
+				ok, errs := check.Test(link)
+				fmt.Println(link.SrcLink.Title, ":", rule.Name, check.Name(), ":", ok, errs)
+			}
+		}
+	}
+
+	//fmt.Println(sumObj)
 	// [ ] Apply rules
 	// [ ] Render template + data
 
