@@ -10,11 +10,11 @@ import (
 	"github.com/kazhuravlev/just"
 )
 
-// gExtractors contains all available etractors. This is like a registry of all
+// gExtractors contains all available extractors. This is like a registry of all
 // extractors.
 var gExtractors = make(map[FactName]FactExtractor)
 
-// gExtractorsOrdering contains order of fact etractors. This is executing
+// gExtractorsOrdering contains order of fact extractors. This is executing
 // order.
 var gExtractorsOrdering []FactName
 
