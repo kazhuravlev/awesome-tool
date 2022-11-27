@@ -4,7 +4,6 @@ import "github.com/kazhuravlev/just"
 
 type RuleName string
 type GroupName string
-type CheckName string
 
 type Source struct {
 	Version            string     `yaml:"version"`
@@ -14,15 +13,10 @@ type Source struct {
 	Links              []Link     `yaml:"links"`
 }
 
-type Check struct {
-	Check CheckName `yaml:"check"`
-	Args  []string  `yaml:"args"`
-}
-
 type Rule struct {
 	Name   RuleName `yaml:"name"`
 	Title  string   `yaml:"title"`
-	Checks []Check  `yaml:"checks"`
+	Checks []string `yaml:"checks"`
 }
 
 type Group struct {
