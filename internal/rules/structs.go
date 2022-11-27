@@ -4,9 +4,10 @@ import "github.com/kazhuravlev/awesome-tool/internal/sum"
 
 type Check interface {
 	Name() CheckName
-	Test(sum.Link) (bool, []Error)
+	FactDeps() []sum.FactName
+	Test(l sum.Link) (bool, []Error)
 }
 
-type Error struct{}
+type Error string
 
 type CheckName string
