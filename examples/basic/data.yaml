@@ -1,20 +1,16 @@
 version: '1'
 
 rules:
-#  - name: uniq
-#    title: Links should not be repeated
-#    checks:
-#      - check: links:url:uniq
   - name: http-200
     title: Link should be available
     checks:
-      - check: link:response:status-one-of(200)
+      - check: link::response:status-one-of(200)
   - name: min-github-stars
     title: Repo should have at least 10 stars
     checks:
       # This rule will be succeeded when this link is GitHub repo AND this repo
       # have at least 10 stars.
-      - check: link:github-repo:stars-min(20)
+      - check: link::github-repo:stars-min(20)
 
 # This rules will be enabled by default for all links
 global-rules-enabled:
