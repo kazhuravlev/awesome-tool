@@ -3,7 +3,9 @@ package rules
 import (
 	"errors"
 	"fmt"
+	"github.com/kazhuravlev/awesome-tool/internal/errorsh"
 	"regexp"
+	"strconv"
 
 	"github.com/kazhuravlev/just"
 )
@@ -27,7 +29,7 @@ func MustRegisterCheck(check Check) {
 	}
 }
 
-func ParseCheck(s string) (CheckName, string, error) {
+func parseCheckCall(s string) (CheckName, string, error) {
 	match := reCheck.FindStringSubmatch(s)
 	if len(match) != len(reCheck.SubexpNames()) {
 		return "", "", errors.New("check is not valid")
@@ -41,4 +43,34 @@ func ParseCheck(s string) (CheckName, string, error) {
 	}
 
 	return CheckName(result["name"]), result["args"], nil
+}
+
+func ParseCheck(s string) (Check, error) {
+	checkName, checkArgs, err := parseCheckCall(s)
+	if err != nil {
+		return nil, errorsh.Wrap(err, "parse check call")
+	}
+
+	switch checkName {
+	default:
+		return nil, errorsh.Newf("unknown check '%s'", checkName)
+	case "response:status-eq":
+		statusCode, err := strconv.Atoi(checkArgs)
+		if err != nil {
+			return nil, errorsh.Wrapf(err, "bad arguments for check '%s'", checkName)
+		}
+
+		return CheckResponseStatusEq{
+			ExpectedStatus: statusCode,
+		}, nil
+	case "github-repo:stars-min":
+		minimumStars, err := strconv.Atoi(checkArgs)
+		if err != nil {
+			return nil, errorsh.Wrapf(err, "bad arguments for check '%s'", checkName)
+		}
+
+		return CheckResponseStatusEq{
+			ExpectedStatus: minimumStars,
+		}, nil
+	}
 }
