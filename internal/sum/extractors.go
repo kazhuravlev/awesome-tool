@@ -8,10 +8,16 @@ import (
 	"time"
 )
 
+const (
+	FactUrl      FactName = "url"
+	FactGithub   FactName = "github"
+	FactResponse FactName = "response"
+)
+
 type URL struct{}
 
 func (URL) Name() FactName {
-	return "url"
+	return FactUrl
 }
 
 func (URL) Deps() []FactName {
@@ -33,11 +39,11 @@ type GitHub struct {
 }
 
 func (GitHub) Name() FactName {
-	return "github"
+	return FactGithub
 }
 
 func (GitHub) Deps() []FactName {
-	return []FactName{"url"}
+	return []FactName{FactUrl}
 }
 
 func (GitHub) Extract(ctx context.Context, link *Link) (bool, error) {
@@ -53,11 +59,11 @@ type Response struct {
 }
 
 func (Response) Name() FactName {
-	return "response"
+	return FactResponse
 }
 
 func (Response) Deps() []FactName {
-	return []FactName{"url"}
+	return []FactName{FactUrl}
 }
 
 func (r *Response) Extract(ctx context.Context, link *Link) (bool, error) {
