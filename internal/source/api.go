@@ -39,6 +39,12 @@ func Validate(obj Source) error {
 		rulesMap[rule.Name] = struct{}{}
 	}
 
+	for _, ruleName := range obj.GlobalRulesEnabled {
+		if !just.MapContainsKey(rulesMap, ruleName) {
+			return errorsh.Newf("unknown global-enabled-rule '%s'", ruleName)
+		}
+	}
+
 	groupsMap := make(map[GroupName]struct{}, len(obj.Groups))
 	for i := range obj.Groups {
 		group := &obj.Groups[i]
