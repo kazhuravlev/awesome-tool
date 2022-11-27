@@ -11,21 +11,6 @@ import (
 )
 
 func Run(ctx context.Context, filename string) error {
-	// NOTE: register extractors
-	{
-		sum.MustRegisterExtractor(sum.URL{})
-		sum.MustRegisterExtractor(&sum.Response{
-			Client:  http.DefaultClient,
-			Timeout: time.Second,
-		})
-		sum.MustRegisterExtractor(sum.GitHub{})
-	}
-
-	// NOTE: register checks
-	{
-		//rules.MustRegisterCheck(nil)
-	}
-
 	sourceObj, err := source.ParseFile(filename)
 	if err != nil {
 		return errorsh.Wrap(err, "parse source file")
@@ -33,6 +18,18 @@ func Run(ctx context.Context, filename string) error {
 
 	if err := source.Validate(*sourceObj); err != nil {
 		return errorsh.Wrap(err, "validate source object")
+	}
+
+	// NOTE: register extractors
+	{
+		// TODO: extract uniq deps from current checks and use only required
+		//   fact extractors.
+		sum.MustRegisterExtractor(sum.URL{})
+		sum.MustRegisterExtractor(&sum.Response{
+			Client:  http.DefaultClient,
+			Timeout: 3 * time.Second,
+		})
+		sum.MustRegisterExtractor(sum.GitHub{})
 	}
 
 	sumObj, err := sum.GatherFacts(ctx, *sourceObj)
