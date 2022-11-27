@@ -1,8 +1,10 @@
 package sum
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"github.com/kazhuravlev/awesome-tool/internal/errorsh"
 
 	"github.com/kazhuravlev/awesome-tool/internal/source"
 	"github.com/kazhuravlev/just"
@@ -40,7 +42,7 @@ func MustRegisterExtractor(extractor FactExtractor) {
 	}
 }
 
-func GatherFacts(link source.Link) (*Link, error) {
+func GatherFactsLink(ctx context.Context, link source.Link) (*Link, error) {
 	resLink := Link{
 		SrcLink: link,
 		Facts:   LinkFacts{},
@@ -57,8 +59,32 @@ ExtractCycle:
 			}
 		}
 
-		readyMap[extractor.Name()] = extractor.Extract(&resLink)
+		ok, err := extractor.Extract(ctx, &resLink)
+		if err != nil {
+			return nil, errorsh.Wrap(err, "extract fact")
+		}
+
+		readyMap[extractor.Name()] = ok
 	}
 
 	return &resLink, nil
+}
+
+func GatherFacts(ctx context.Context, sourceObj source.Source) (*Sum, error) {
+	links := make([]Link, len(sourceObj.Links))
+	for i, link := range sourceObj.Links {
+		out, err := GatherFactsLink(ctx, link)
+		if err != nil {
+			return nil, err
+		}
+
+		links[i] = *out
+	}
+
+	return &Sum{
+		Version: sourceObj.Version,
+		Rules:   sourceObj.Rules,
+		Groups:  sourceObj.Groups,
+		Links:   links,
+	}, nil
 }

@@ -1,6 +1,7 @@
 package sum
 
 import (
+	"context"
 	"net/url"
 	"time"
 
@@ -43,6 +44,6 @@ type FactExtractor interface {
 	Name() FactName
 	// Deps of this extractor
 	Deps() []FactName
-	// Implementation of extractor
-	Extract(*Link) bool
+	// Extract implements of extractor
+	Extract(context.Context, *Link) (bool, error)
 }

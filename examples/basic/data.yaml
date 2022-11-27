@@ -1,23 +1,23 @@
 version: '1'
 
 rules:
+#  - name: uniq
+#    title: Links should not be repeated
+#    checks:
+#      - check: links:url:uniq
   - name: http-200
     title: Link should be available
     checks:
-      - check: response:status-one-of
-        args:
-          - 200
+      - check: link:response:status-one-of(200)
   - name: min-github-stars
     title: Repo should have at least 10 stars
     checks:
-      # This rule will be succeed when this link is GitHub repo AND this repo 
+      # This rule will be succeeded when this link is GitHub repo AND this repo
       # have at least 10 stars.
-      - check: github-repo:stars-min
-        args:
-          - 10
+      - check: link:github-repo:stars-min(20)
 
 # This rules will be enabled by default for all links
-global-rules-enabled: 
+global-rules-enabled:
   - http-200
   - min-github-stars
 
@@ -31,7 +31,7 @@ groups:
     group: main
   - name: articles
     title: Long read articles
-      # This rules will apply on all links inside
+    # This rules will apply on all links inside
     rules-enabled:
       - http-200
   # Empty groups will not shows in result file 
@@ -44,22 +44,22 @@ groups:
 
 
 links:
-  - url: https://github.com/kazhuravlev/awesome-tool
-    title: Awesome tools for awesome repos
-    rules-enabled:
-      - min-github-stars
-    groups:
-      - awesome
-      - main
-  # This link will trigger a warning about https
-  - url: http://example.com
-    title: Just an example
-    # groups:
-    #   - not-exists-group
-  - url: bad link
-    title: Answer on The Ultimate Question of Life, the Universe, and Everything
-    groups: 
-      - awesome
+  # - url: https://github.com/kazhuravlev/awesome-tool
+  #   title: Awesome tools for awesome repos
+  #   rules-enabled:
+  #     - min-github-stars
+  #   groups:
+  #     - awesome
+  #     - main
+  # # This link will trigger a warning about https
+  # - url: http://example.com
+  #   title: Just an example
+  #   # groups:
+  #   #   - not-exists-group
+  # - url: bad link
+  #   title: Answer on The Ultimate Question of Life, the Universe, and Everything
+  #   groups: 
+  #     - awesome
   - url: https://mock.codes/404
     title: Paper, which was written at ~ 1980
     rules-ignored:
