@@ -27,7 +27,7 @@ type Link struct {
 type LinkFacts struct {
 	Url      *url.URL
 	Response ResponseData
-	Github   struct{}
+	Github   GithubData
 }
 
 type ResponseData struct {
@@ -37,6 +37,11 @@ type ResponseData struct {
 	StatusCode int
 	Body       []byte
 	Headers    map[string][]string
+}
+
+type GithubData struct {
+	// FIXME: fill values
+	StarsCount int
 }
 
 type FactExtractor interface {

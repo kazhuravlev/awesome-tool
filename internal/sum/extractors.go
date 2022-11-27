@@ -47,9 +47,7 @@ func (GitHub) Deps() []FactName {
 }
 
 func (GitHub) Extract(ctx context.Context, link *Link) (bool, error) {
-	u := link.Facts.Url
-
-	link.Facts.Url = u
+	// FIXME: implement
 	return true, nil
 }
 
