@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/kazhuravlev/awesome-tool/internal/source"
+	"github.com/kazhuravlev/just"
 )
 
 const version = "1"
@@ -20,8 +21,9 @@ type Sum struct {
 }
 
 type Link struct {
-	SrcLink source.Link
-	Facts   LinkFacts
+	SrcLink        source.Link
+	FactsCollected map[FactName]bool
+	Facts          LinkFacts
 	// NOTE: This is a duplicate for each link. It is a result set of rules,
 	//   which will applied to exact this link after all enable/disable/ignore
 	//   rules.
@@ -44,8 +46,25 @@ type ResponseData struct {
 }
 
 type GithubData struct {
-	// FIXME: fill values
-	StarsCount int
+	OwnerUsername    string
+	Name             string
+	Description      just.NullVal[string]
+	Homepage         just.NullVal[string]
+	DefaultBranch    string
+	CreatedAt        time.Time
+	PushedAt         time.Time
+	Language         just.NullVal[string]
+	Fork             bool
+	ForksCount       int
+	NetworkCount     int
+	OpenIssuesCount  int
+	StargazersCount  int
+	SubscribersCount int
+	WatchersCount    int
+	Topics           []string
+	Archived         bool
+	Disabled         bool
+	License          just.NullVal[string]
 }
 
 type FactExtractor interface {

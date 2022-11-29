@@ -2,13 +2,17 @@ package sum
 
 import (
 	"context"
+	"errors"
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/google/go-github/v48/github"
+	"github.com/kazhuravlev/awesome-tool/internal/errorsh"
 	"github.com/kazhuravlev/awesome-tool/internal/source"
+	"github.com/kazhuravlev/just"
 )
 
 const (
@@ -50,8 +54,46 @@ func (GitHub) Deps() []FactName {
 	return []FactName{FactUrl}
 }
 
-func (GitHub) Extract(ctx context.Context, link source.Link, facts *LinkFacts) (bool, error) {
-	// FIXME: implement
+func (e *GitHub) Extract(ctx context.Context, link source.Link, facts *LinkFacts) (bool, error) {
+	if facts.Url.Host != "github.com" {
+		return false, nil
+	}
+
+	parts := strings.Split(facts.Url.Path[1:], "/")
+	if len(parts) != 2 {
+		return false, errors.New("this is not a github repo url")
+	}
+
+	res, httpResp, err := e.Client.Repositories.Get(ctx, parts[0], parts[1])
+	if err != nil {
+		if httpResp != nil && httpResp.StatusCode == http.StatusNotFound {
+			return false, nil
+		}
+
+		return false, errorsh.Wrap(err, "get repository details")
+	}
+
+	facts.Github = GithubData{
+		OwnerUsername:    just.PointerUnwrap(res.Owner.Login),
+		Name:             just.PointerUnwrap(res.Name),
+		Description:      just.NullDefaultFalse(just.PointerUnwrapDefault(res.Description, "")),
+		Homepage:         just.NullDefaultFalse(just.PointerUnwrapDefault(res.Homepage, "")),
+		DefaultBranch:    just.PointerUnwrap(res.DefaultBranch),
+		CreatedAt:        just.PointerUnwrap(res.CreatedAt).Time,
+		PushedAt:         just.PointerUnwrap(res.PushedAt).Time,
+		Language:         just.Null(just.PointerUnwrapDefault(res.Language, "")),
+		Fork:             just.PointerUnwrap(res.Fork),
+		ForksCount:       just.PointerUnwrap(res.ForksCount),
+		NetworkCount:     just.PointerUnwrap(res.NetworkCount),
+		OpenIssuesCount:  just.PointerUnwrap(res.OpenIssuesCount),
+		StargazersCount:  just.PointerUnwrap(res.StargazersCount),
+		SubscribersCount: just.PointerUnwrap(res.SubscribersCount),
+		WatchersCount:    just.PointerUnwrap(res.WatchersCount),
+		Topics:           res.Topics,
+		Archived:         just.PointerUnwrap(res.Archived),
+		Disabled:         just.PointerUnwrap(res.Disabled),
+		License:          just.NullDefaultFalse(just.PointerUnwrapDefault(just.PointerUnwrapDefault(res.License, github.License{}).Name, "")),
+	}
 	return true, nil
 }
 
