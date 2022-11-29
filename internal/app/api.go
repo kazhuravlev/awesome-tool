@@ -3,15 +3,26 @@ package app
 import (
 	"context"
 	"fmt"
+
 	"github.com/kazhuravlev/awesome-tool/internal/errorsh"
 	"github.com/kazhuravlev/awesome-tool/internal/rules"
 	"github.com/kazhuravlev/awesome-tool/internal/source"
 	"github.com/kazhuravlev/awesome-tool/internal/sum"
-	"net/http"
-	"time"
 )
 
-func Run(ctx context.Context, filename string) error {
+type App struct {
+	opts Options
+}
+
+func New(opts Options) (*App, error) {
+	if err := opts.Validate(); err != nil {
+		return nil, errorsh.Wrap(err, "bad configuration")
+	}
+
+	return &App{opts: opts}, nil
+}
+
+func (a *App) Run(ctx context.Context, filename string) error {
 	sourceObj, err := source.ParseFile(filename)
 	if err != nil {
 		return errorsh.Wrap(err, "parse source file")
@@ -39,10 +50,12 @@ func Run(ctx context.Context, filename string) error {
 		//   fact extractors.
 		sum.MustRegisterExtractor(sum.URL{})
 		sum.MustRegisterExtractor(&sum.Response{
-			Client:  http.DefaultClient,
-			Timeout: 3 * time.Second,
+			Client:  a.opts.responseHttpClient,
+			Timeout: a.opts.responseTimeout,
 		})
-		sum.MustRegisterExtractor(sum.GitHub{})
+		sum.MustRegisterExtractor(sum.GitHub{
+			Client: a.opts.githubClient,
+		})
 	}
 
 	sumObj, err := sum.GatherFacts(ctx, *sourceObj)

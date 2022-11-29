@@ -2,11 +2,13 @@ package sum
 
 import (
 	"context"
-	"github.com/kazhuravlev/awesome-tool/internal/source"
 	"io"
 	"net/http"
 	"net/url"
 	"time"
+
+	"github.com/google/go-github/v48/github"
+	"github.com/kazhuravlev/awesome-tool/internal/source"
 )
 
 const (
@@ -37,6 +39,7 @@ func (URL) Extract(_ context.Context, link source.Link, facts *LinkFacts) (bool,
 
 type GitHub struct {
 	// TODO: add github client, http client, credentials
+	Client *github.Client
 }
 
 func (GitHub) Name() FactName {
