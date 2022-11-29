@@ -42,7 +42,7 @@ func MustRegisterExtractor(extractor FactExtractor) {
 	}
 }
 
-func gatherFactsLink(ctx context.Context, link source.Link) (*LinkFacts, error) {
+func gatherFactsLink(ctx context.Context, link source.Link) (map[FactName]bool, *LinkFacts, error) {
 	var facts LinkFacts
 
 	readyMap := make(map[FactName]bool, len(gExtractors))
@@ -58,13 +58,13 @@ ExtractCycle:
 
 		ok, err := extractor.Extract(ctx, link, &facts)
 		if err != nil {
-			return nil, errorsh.Wrap(err, "extract fact")
+			return nil, nil, errorsh.Wrap(err, "extract fact")
 		}
 
 		readyMap[extractor.Name()] = ok
 	}
 
-	return &facts, nil
+	return readyMap, &facts, nil
 }
 
 func GatherFacts(ctx context.Context, sourceObj source.Source) (*Sum, error) {
@@ -82,15 +82,21 @@ func GatherFacts(ctx context.Context, sourceObj source.Source) (*Sum, error) {
 	for i, link := range sourceObj.Links {
 		// FIXME: implement group-level rules
 		// FIXME: implement link-level rules
-		facts, err := gatherFactsLink(ctx, link)
+		linkRules := just.SliceCopy(globalRules)
+		linkRules = just.SliceFilter(linkRules, func(rule source.Rule) bool {
+			return !just.SliceContainsElem(link.RulesIgnored, rule.Name)
+		})
+
+		factCollected, facts, err := gatherFactsLink(ctx, link)
 		if err != nil {
 			return nil, err
 		}
 
 		links[i] = Link{
-			SrcLink: link,
-			Facts:   *facts,
-			Rules:   globalRules,
+			SrcLink:        link,
+			FactsCollected: factCollected,
+			Facts:          *facts,
+			Rules:          linkRules,
 		}
 	}
 

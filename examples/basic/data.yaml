@@ -40,13 +40,13 @@ groups:
 
 
 links:
-  # - url: https://github.com/kazhuravlev/awesome-tool
-  #   title: Awesome tools for awesome repos
-  #   rules-enabled:
-  #     - min-github-stars
-  #   groups:
-  #     - awesome
-  #     - main
+  - url: https://github.com/kazhuravlev/just
+    title: Awesome tools for awesome repos
+    rules-enabled:
+      - min-github-stars
+    groups:
+      - awesome
+      - main
   # # This link will trigger a warning about https
   # - url: http://example.com
   #   title: Just an example
@@ -60,6 +60,7 @@ links:
     title: Paper, which was written at ~ 1980
     rules-ignored:
       - http-200
+      - min-github-stars
     groups:
       - articles
   

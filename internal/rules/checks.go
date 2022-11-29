@@ -43,11 +43,11 @@ func (c CheckGithubStarsMin) FactDeps() []sum.FactName {
 }
 
 func (c CheckGithubStarsMin) Test(link sum.Link) (bool, []Error) {
-	if link.Facts.Github.StarsCount < c.MinStars {
+	if link.Facts.Github.StargazersCount < c.MinStars {
 		return false, []Error{
 			Error(fmt.Sprintf(
 				"repository has not enough stars '%d'. Required at least '%d' stars",
-				link.Facts.Github.StarsCount,
+				link.Facts.Github.StargazersCount,
 				c.MinStars,
 			)),
 		}

@@ -8,6 +8,7 @@ import (
 	"github.com/kazhuravlev/awesome-tool/internal/rules"
 	"github.com/kazhuravlev/awesome-tool/internal/source"
 	"github.com/kazhuravlev/awesome-tool/internal/sum"
+	"github.com/kazhuravlev/just"
 )
 
 type App struct {
@@ -48,12 +49,12 @@ func (a *App) Run(ctx context.Context, filename string) error {
 	{
 		// TODO: extract uniq deps from current checks and use only required
 		//   fact extractors.
-		sum.MustRegisterExtractor(sum.URL{})
+		sum.MustRegisterExtractor(&sum.URL{})
 		sum.MustRegisterExtractor(&sum.Response{
 			Client:  a.opts.responseHttpClient,
 			Timeout: a.opts.responseTimeout,
 		})
-		sum.MustRegisterExtractor(sum.GitHub{
+		sum.MustRegisterExtractor(&sum.GitHub{
 			Client: a.opts.githubClient,
 		})
 	}
@@ -67,6 +68,14 @@ func (a *App) Run(ctx context.Context, filename string) error {
 		for _, rule := range link.Rules {
 			for _, checkStringRaw := range rule.Checks {
 				check := checks[checkStringRaw]
+				allFactsIsCollected := just.SliceAll(check.FactDeps(), func(factName sum.FactName) bool {
+					return link.FactsCollected[factName]
+				})
+				if !allFactsIsCollected {
+					fmt.Println(link.SrcLink.Title, ":", rule.Name, check.Name(), ":", false, []string{"not all facts is collected"})
+					continue
+				}
+
 				ok, errs := check.Test(link)
 				fmt.Println(link.SrcLink.Title, ":", rule.Name, check.Name(), ":", ok, errs)
 			}
