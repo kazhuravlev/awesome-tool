@@ -2,7 +2,9 @@ package rules
 
 import (
 	"fmt"
-	"github.com/kazhuravlev/awesome-tool/internal/sum"
+
+	"github.com/kazhuravlev/awesome-tool/internal/facts"
+	"github.com/kazhuravlev/awesome-tool/internal/source"
 )
 
 type CheckResponseStatusEq struct {
@@ -13,16 +15,16 @@ func (c CheckResponseStatusEq) Name() CheckName {
 	return "response:status-eq"
 }
 
-func (c CheckResponseStatusEq) FactDeps() []sum.FactName {
-	return []sum.FactName{sum.FactResponse}
+func (c CheckResponseStatusEq) FactDeps() []facts.FactName {
+	return []facts.FactName{facts.FactResponse}
 }
 
-func (c CheckResponseStatusEq) Test(link sum.Link) (bool, []Error) {
-	if link.Facts.Response.StatusCode != c.ExpectedStatus {
+func (c CheckResponseStatusEq) Test(link source.Link, linkFacts facts.Facts) (bool, []Error) {
+	if linkFacts.Data.Response.StatusCode != c.ExpectedStatus {
 		return false, []Error{
 			Error(fmt.Sprintf(
 				"response status code is '%d', but should be '%d'",
-				link.Facts.Response.StatusCode,
+				linkFacts.Data.Response.StatusCode,
 				c.ExpectedStatus,
 			)),
 		}
@@ -38,16 +40,16 @@ func (c CheckGithubStarsMin) Name() CheckName {
 	return "github-repo:stars-min"
 }
 
-func (c CheckGithubStarsMin) FactDeps() []sum.FactName {
-	return []sum.FactName{sum.FactGithub}
+func (c CheckGithubStarsMin) FactDeps() []facts.FactName {
+	return []facts.FactName{facts.FactGithub}
 }
 
-func (c CheckGithubStarsMin) Test(link sum.Link) (bool, []Error) {
-	if link.Facts.Github.StargazersCount < c.MinStars {
+func (c CheckGithubStarsMin) Test(link source.Link, linkFacts facts.Facts) (bool, []Error) {
+	if linkFacts.Data.Github.StargazersCount < c.MinStars {
 		return false, []Error{
 			Error(fmt.Sprintf(
 				"repository has not enough stars '%d'. Required at least '%d' stars",
-				link.Facts.Github.StargazersCount,
+				linkFacts.Data.Github.StargazersCount,
 				c.MinStars,
 			)),
 		}
