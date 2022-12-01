@@ -37,12 +37,23 @@ type UrlData struct {
 	URL url.URL
 }
 
+type ByteString []byte
+
+func (bs ByteString) MarshalYAML() (any, error) {
+	return string(bs), nil
+}
+
+func (bs *ByteString) UnmarshalYAML(b []byte) error {
+	*bs = b
+	return nil
+}
+
 type ResponseData struct {
 	// {2, 0} means http 2/0
 	Protocol   [2]int
 	Duration   time.Duration
 	StatusCode int
-	Body       []byte
+	Body       ByteString
 	Headers    map[string][]string
 }
 

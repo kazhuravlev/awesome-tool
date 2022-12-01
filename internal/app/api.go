@@ -4,10 +4,12 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/goccy/go-yaml"
 	"github.com/kazhuravlev/awesome-tool/internal/errorsh"
 	"github.com/kazhuravlev/awesome-tool/internal/facts"
 	"github.com/kazhuravlev/awesome-tool/internal/rules"
 	"github.com/kazhuravlev/awesome-tool/internal/source"
+	"github.com/kazhuravlev/awesome-tool/internal/sum"
 	"github.com/kazhuravlev/just"
 )
 
@@ -59,9 +61,9 @@ func (a *App) Run(ctx context.Context, filename string) error {
 		})
 	}
 
-	linkFacts := make([]facts.Facts, len(sourceObj.Links))
-	for i := range sourceObj.Links {
-		link := &sourceObj.Links[i]
+	linkFacts := make(map[int]facts.Facts, len(sourceObj.Links))
+	for linkIdx := range sourceObj.Links {
+		link := &sourceObj.Links[linkIdx]
 
 		fmt.Printf("Gather facts about '%s'\n", link.URL)
 		facts, err := facts.GatherFacts(ctx, *link)
@@ -69,7 +71,7 @@ func (a *App) Run(ctx context.Context, filename string) error {
 			return errorsh.Wrapf(err, "gather facts for link '%s'", link.URL)
 		}
 
-		linkFacts[i] = *facts
+		linkFacts[linkIdx] = *facts
 	}
 
 	rulesMap := make(map[source.RuleName]source.Rule)
@@ -82,6 +84,8 @@ func (a *App) Run(ctx context.Context, filename string) error {
 		return rulesMap[rn]
 	})
 
+	linksRules := make(map[int][]source.Rule, len(sourceObj.Links))
+	linksChecks := make(map[int]map[string][]rules.Error, len(sourceObj.Links))
 	for linkIdx, link := range sourceObj.Links {
 		// FIXME: implement group-level rules
 		// FIXME: implement link-level rules
@@ -90,6 +94,9 @@ func (a *App) Run(ctx context.Context, filename string) error {
 			return !just.SliceContainsElem(link.RulesIgnored, rule.Name)
 		})
 
+		linksRules[linkIdx] = linkRules
+
+		linkChecks := make(map[string][]rules.Error, len(linkRules))
 		for _, rule := range linkRules {
 			for _, checkStringRaw := range rule.Checks {
 				check := checks[checkStringRaw]
@@ -98,15 +105,36 @@ func (a *App) Run(ctx context.Context, filename string) error {
 				})
 				if !allFactsIsCollected {
 					fmt.Println(link.Title, ":", rule.Name, check.Name(), ":", false, []string{"not all facts is collected"})
+					linkChecks["__deps__"] = []rules.Error{"Not all deps facts is collected"}
 					continue
 				}
 
 				ok, errs := check.Test(link, linkFacts[linkIdx])
 				fmt.Println(link.Title, ":", rule.Name, check.Name(), ":", ok, errs)
+				linkChecks[checkStringRaw] = errs
 			}
 		}
-	}
 
+		linksChecks[linkIdx] = linkChecks
+	}
+	{
+		sumObj := sum.Sum{
+			Version:     "1",
+			GlobalRules: sourceObj.GlobalRulesEnabled,
+			Groups:      sourceObj.Groups,
+			Links:       sourceObj.Links,
+			LinksRules:  linksRules,
+			LinksFacts:  linkFacts,
+			LinksChecks: linksChecks,
+		}
+
+		sumYaml, err := yaml.Marshal(sumObj)
+		if err != nil {
+			return errorsh.Wrap(err, "marshal sum object")
+		}
+
+		fmt.Println(string(sumYaml))
+	}
 	//fmt.Println(sumObj)
 	// [ ] Apply rules
 	// [ ] Render template + data
