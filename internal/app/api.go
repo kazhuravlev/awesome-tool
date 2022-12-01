@@ -85,7 +85,7 @@ func (a *App) Run(ctx context.Context, filename string) error {
 	})
 
 	linksRules := make(map[int][]source.Rule, len(sourceObj.Links))
-	linksChecks := make(map[int]map[string][]rules.Error, len(sourceObj.Links))
+	linksChecks := make(map[int]map[string]rules.CheckResult, len(sourceObj.Links))
 	for linkIdx, link := range sourceObj.Links {
 		// FIXME: implement group-level rules
 		// FIXME: implement link-level rules
@@ -96,7 +96,7 @@ func (a *App) Run(ctx context.Context, filename string) error {
 
 		linksRules[linkIdx] = linkRules
 
-		linkChecks := make(map[string][]rules.Error, len(linkRules))
+		linkChecks := make(map[string]rules.CheckResult, len(linkRules))
 		for _, rule := range linkRules {
 			for _, checkStringRaw := range rule.Checks {
 				check := checks[checkStringRaw]
@@ -105,13 +105,18 @@ func (a *App) Run(ctx context.Context, filename string) error {
 				})
 				if !allFactsIsCollected {
 					fmt.Println(link.Title, ":", rule.Name, check.Name(), ":", false, []string{"not all facts is collected"})
-					linkChecks["__deps__"] = []rules.Error{"Not all deps facts is collected"}
+					// FIXME: add mark about dependency check
+					linkChecks["__deps__"] = rules.CheckResult{
+						CheckName: "Dependency check",
+						IsPassed:  false,
+						Errors:    []rules.Error{"Not all deps facts is collected"},
+					}
 					continue
 				}
 
-				ok, errs := check.Test(link, linkFacts[linkIdx])
-				fmt.Println(link.Title, ":", rule.Name, check.Name(), ":", ok, errs)
-				linkChecks[checkStringRaw] = errs
+				checkResult := check.Test(link, linkFacts[linkIdx])
+				fmt.Println(link.Title, ":", rule.Name, check.Name(), ":", checkResult)
+				linkChecks[checkStringRaw] = checkResult
 			}
 		}
 

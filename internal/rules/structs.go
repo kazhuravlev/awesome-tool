@@ -9,12 +9,18 @@ import (
 type Check interface {
 	Name() CheckName
 	FactDeps() []facts.FactName
-	Test(l source.Link, lFacts facts.Facts) (bool, []Error)
+	Test(l source.Link, lFacts facts.Facts) CheckResult
 }
 
 type Error string
 
 type CheckName string
+
+type CheckResult struct {
+	CheckName CheckName
+	IsPassed  bool
+	Errors    []Error
+}
 
 type RulesResults struct {
 	Reports map[source.RuleName]map[CheckName]bool
