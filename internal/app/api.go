@@ -117,17 +117,9 @@ func (a *App) Run(ctx context.Context, filename string) error {
 
 		linksChecks[linkIdx] = linkChecks
 	}
-	{
-		sumObj := sum.Sum{
-			Version:     "1",
-			GlobalRules: sourceObj.GlobalRulesEnabled,
-			Groups:      sourceObj.Groups,
-			Links:       sourceObj.Links,
-			LinksRules:  linksRules,
-			LinksFacts:  linkFacts,
-			LinksChecks: linksChecks,
-		}
 
+	{
+		sumObj := sum.Build(*sourceObj, linksRules, linkFacts, linksChecks)
 		sumYaml, err := yaml.Marshal(sumObj)
 		if err != nil {
 			return errorsh.Wrap(err, "marshal sum object")
@@ -135,6 +127,7 @@ func (a *App) Run(ctx context.Context, filename string) error {
 
 		fmt.Println(string(sumYaml))
 	}
+
 	//fmt.Println(sumObj)
 	// [ ] Apply rules
 	// [ ] Render template + data

@@ -24,3 +24,5 @@ type Sum struct {
 	// LinksFacts is a map of link idx => facts
 	LinksFacts map[int]facts.Facts
 }
+
+// TODO: dump sum object as tree
