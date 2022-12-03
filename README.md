@@ -1,5 +1,7 @@
 # Awesome tool for Awesome repos
 
+![Cover](./cover.svg)
+
 This tool is allow to create and manage awesome lists easily.
 
 ## How it works
