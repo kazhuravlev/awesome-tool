@@ -176,7 +176,7 @@ func (a *App) Run(ctx context.Context, filename string) error {
 	return nil
 }
 
-func (a App) Render() error {
+func (a App) Render(ctx context.Context) error {
 	var sumObj sum.Sum
 	{
 		bb, err := os.ReadFile(outFilename)
