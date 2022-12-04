@@ -1,6 +1,6 @@
 # Awesome tool for Awesome repos
 
-![Cover](./cover.svg)
+![Awesome Tool](./cover.svg)
 
 This tool is allow to create and manage awesome lists easily.
 
@@ -28,6 +28,7 @@ track changes across commits.
 
 ## Features
 
+- [ ] Gather facts for big awesome lists (rate limiters, auto-continue process)
 - [ ] Render Markdown
 - [ ] Render HTML
 - [ ] Custom HTML template
