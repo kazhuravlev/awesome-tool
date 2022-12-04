@@ -62,7 +62,7 @@ func (a *App) Run(ctx context.Context, filename string) error {
 		//   fact extractors.
 		facts.MustRegisterExtractor(&facts.URL{})
 		facts.MustRegisterExtractor(&facts.Response{
-			Client:  a.opts.responseHttpClient,
+			Client:  a.opts.http,
 			Timeout: a.opts.responseTimeout,
 		})
 		facts.MustRegisterExtractor(&facts.GitHub{

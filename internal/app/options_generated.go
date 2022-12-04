@@ -2,10 +2,10 @@
 package app
 
 import (
-	"net/http"
 	"time"
 
 	"github.com/google/go-github/v48/github"
+	"github.com/kazhuravlev/awesome-tool/pkg/httph"
 )
 
 type OptOptionsSetter func(o *Options)
@@ -16,20 +16,14 @@ func NewOptions(
 	o := Options{}
 
 	// Setting defaults from variable
-	o.responseHttpClient = defaultOptions.responseHttpClient
 	o.responseTimeout = defaultOptions.responseTimeout
 	o.githubClient = defaultOptions.githubClient
+	o.http = defaultOptions.http
 
 	for _, opt := range options {
 		opt(&o)
 	}
 	return o
-}
-
-func WithResponseHttpClient(opt *http.Client) OptOptionsSetter {
-	return func(o *Options) {
-		o.responseHttpClient = opt
-	}
 }
 
 func WithResponseTimeout(opt time.Duration) OptOptionsSetter {
@@ -41,6 +35,12 @@ func WithResponseTimeout(opt time.Duration) OptOptionsSetter {
 func WithGithubClient(opt *github.Client) OptOptionsSetter {
 	return func(o *Options) {
 		o.githubClient = opt
+	}
+}
+
+func WithHttp(opt *httph.Client) OptOptionsSetter {
+	return func(o *Options) {
+		o.http = opt
 	}
 }
 
