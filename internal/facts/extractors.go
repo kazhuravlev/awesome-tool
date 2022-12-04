@@ -190,3 +190,33 @@ func filterAdaptHeaders(headers http.Header) map[string]string {
 
 	return res
 }
+
+type Meta struct{}
+
+func (Meta) Name() FactName {
+	return "meta"
+}
+
+func (Meta) Deps() []FactName {
+	return nil
+}
+
+func (Meta) Extract(ctx context.Context, link source.Link, facts *Data) (bool, error) {
+	titleExtractors := []func() string{
+		func() string { return link.Title },
+		func() string { return facts.Github.Name },
+		func() string { return facts.Response.HtmlTitle },
+	}
+
+	var meta MetaData
+	for _, titleExtractor := range titleExtractors {
+		val := titleExtractor()
+		if val != "" {
+			meta.Title = val
+			break
+		}
+	}
+
+	facts.Meta = meta
+	return true, nil
+}

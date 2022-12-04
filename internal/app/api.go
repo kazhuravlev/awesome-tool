@@ -24,6 +24,8 @@ import (
 	"golang.org/x/sync/semaphore"
 )
 
+var reAnchor = regexp.MustCompile(`[^a-z0-9]+`)
+
 type App struct {
 	opts Options
 }
@@ -70,6 +72,7 @@ func (a *App) Run(ctx context.Context, inFilename, outFilename string) error {
 		facts.MustRegisterExtractor(&facts.GitHub{
 			Client: a.opts.githubClient,
 		})
+		facts.MustRegisterExtractor(&facts.Meta{})
 	}
 
 	linkFactsMu := new(sync.Mutex)
@@ -174,7 +177,7 @@ func (a *App) Run(ctx context.Context, inFilename, outFilename string) error {
 	return nil
 }
 
-func (a App) Render(ctx context.Context, outFilename string) error {
+func (a App) Render(ctx context.Context, outFilename, readmeFilename string) error {
 	var sumObj sum.Sum
 	{
 		bb, err := os.ReadFile(outFilename)
@@ -192,7 +195,6 @@ func (a App) Render(ctx context.Context, outFilename string) error {
 		return errorsh.Wrap(err, "read template")
 	}
 
-	reAnchor := regexp.MustCompile(`[^a-z0-9]+`)
 	tmpl, err := template.New("readme.md").Funcs(template.FuncMap{
 		"anchor": func(s string) string {
 			return strings.Trim(reAnchor.ReplaceAllString(strings.ToLower(s), "-"), " -")
@@ -234,7 +236,9 @@ func (a App) Render(ctx context.Context, outFilename string) error {
 		return errorsh.Wrap(err, "exec template")
 	}
 
-	fmt.Println(buf.String())
+	if err := ioutil.WriteFile(readmeFilename, buf.Bytes(), 0644); err != nil {
+		return errorsh.Wrap(err, "write result readme file")
+	}
 
 	return nil
 }

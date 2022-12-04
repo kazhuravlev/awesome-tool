@@ -16,6 +16,7 @@ import (
 
 const inFilename = "./examples/basic/data.yaml"
 const outFilename = "./sum.yaml"
+const outReadme = "./sum_readme.md"
 
 func main() {
 	app := &cli.App{ //nolint:exhaustruct
@@ -89,7 +90,7 @@ func cmdRender(c *cli.Context) error {
 		return errorsh.Wrap(err, "create application instance")
 	}
 
-	if err := appInst.Render(ctx, outFilename); err != nil {
+	if err := appInst.Render(ctx, outFilename, outReadme); err != nil {
 		return errorsh.Wrap(err, "render templates")
 	}
 

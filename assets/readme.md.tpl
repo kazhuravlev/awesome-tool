@@ -20,8 +20,8 @@ _{{.Group.SrcGroup.Description.Val}}_
 {{- end}}
 
 {{range .Group.Links -}}
-- [{{.SrcLink.Title}}]({{.SrcLink.URL}})
-{{- end}}
+- [{{.Facts.Data.Meta.Title}}]({{.SrcLink.URL}})
+{{end}}
 
 {{- if .Group.Groups -}}
 {{$lvl := .Lvl}}

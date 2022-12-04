@@ -27,9 +27,14 @@ type Facts struct {
 }
 
 type Data struct {
+	Meta     MetaData
 	Url      UrlData
 	Response ResponseData
 	Github   GithubData
+}
+
+type MetaData struct {
+	Title string
 }
 
 type UrlData struct {
