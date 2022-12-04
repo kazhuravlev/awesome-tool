@@ -40,7 +40,11 @@ func (URL) Extract(_ context.Context, link source.Link, facts *Data) (bool, erro
 	}
 
 	facts.Url = UrlData{
-		URL: *u,
+		Scheme:   u.Scheme,
+		Hostname: u.Hostname(),
+		Port:     u.Port(),
+		Path:     u.Path,
+		Query:    u.RawQuery,
 	}
 
 	return true, nil
@@ -59,11 +63,11 @@ func (GitHub) Deps() []FactName {
 }
 
 func (e *GitHub) Extract(ctx context.Context, link source.Link, facts *Data) (bool, error) {
-	if facts.Url.URL.Host != "github.com" {
+	if facts.Url.Hostname != "github.com" {
 		return false, nil
 	}
 
-	parts := strings.Split(facts.Url.URL.Path[1:], "/")
+	parts := strings.Split(facts.Url.Path[1:], "/")
 	if len(parts) != 2 {
 		return false, errors.New("this is not a github repo url")
 	}
@@ -126,7 +130,7 @@ func (r *Response) Extract(ctx context.Context, link source.Link, facts *Data) (
 	}
 
 	start := time.Now()
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, facts.Url.URL.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, link.URL, nil)
 	if err != nil {
 		return false, nil
 	}
@@ -160,9 +164,29 @@ func (r *Response) Extract(ctx context.Context, link source.Link, facts *Data) (
 		Protocol:        [2]int{resp.ProtoMajor, resp.ProtoMinor},
 		Duration:        duration,
 		StatusCode:      resp.StatusCode,
-		HtmlTitle:       htmlTitle,
-		HtmlDescription: htmlDescription,
-		Headers:         resp.Header,
+		HtmlTitle:       strings.TrimSpace(htmlTitle),
+		HtmlDescription: strings.TrimSpace(htmlDescription),
+		Headers:         filterAdaptHeaders(resp.Header),
 	}
 	return true, nil
+}
+
+func filterAdaptHeaders(headers http.Header) map[string]string {
+	allowedHeaders := []string{
+		"content-type",
+		"content-language",
+		"etag",
+	}
+
+	res := make(map[string]string, len(allowedHeaders))
+	for _, header := range allowedHeaders {
+		val := headers.Get(header)
+		if val == "" {
+			continue
+		}
+
+		res[header] = val
+	}
+
+	return res
 }

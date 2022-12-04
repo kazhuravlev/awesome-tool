@@ -2,7 +2,6 @@ package facts
 
 import (
 	"context"
-	"net/url"
 	"time"
 
 	"github.com/kazhuravlev/awesome-tool/internal/source"
@@ -34,7 +33,11 @@ type Data struct {
 }
 
 type UrlData struct {
-	URL url.URL
+	Scheme   string
+	Hostname string
+	Port     string
+	Path     string
+	Query    string
 }
 
 type ByteString []byte
@@ -55,7 +58,7 @@ type ResponseData struct {
 	StatusCode      int
 	HtmlTitle       string
 	HtmlDescription string
-	Headers         map[string][]string
+	Headers         map[string]string
 }
 
 type GithubData struct {
