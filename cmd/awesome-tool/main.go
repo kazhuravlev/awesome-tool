@@ -14,8 +14,8 @@ import (
 	"golang.org/x/time/rate"
 )
 
-const filename = "./examples/basic/data.yaml"
-const outFilename = "./out.yaml"
+const inFilename = "./examples/basic/data.yaml"
+const outFilename = "./sum.yaml"
 
 func main() {
 	app := &cli.App{ //nolint:exhaustruct
@@ -73,7 +73,7 @@ func cmdBuild(c *cli.Context) error {
 		return errorsh.Wrap(err, "create application instance")
 	}
 
-	if err := appInst.Run(ctx, filename); err != nil {
+	if err := appInst.Run(ctx, inFilename, outFilename); err != nil {
 		return errorsh.Wrap(err, "build sum")
 	}
 
@@ -89,7 +89,7 @@ func cmdRender(c *cli.Context) error {
 		return errorsh.Wrap(err, "create application instance")
 	}
 
-	if err := appInst.Render(ctx); err != nil {
+	if err := appInst.Render(ctx, outFilename); err != nil {
 		return errorsh.Wrap(err, "render templates")
 	}
 

@@ -24,8 +24,6 @@ import (
 	"golang.org/x/sync/semaphore"
 )
 
-const outFilename = "sum.yaml"
-
 type App struct {
 	opts Options
 }
@@ -38,8 +36,8 @@ func New(opts Options) (*App, error) {
 	return &App{opts: opts}, nil
 }
 
-func (a *App) Run(ctx context.Context, filename string) error {
-	sourceObj, err := source.ParseFile(filename)
+func (a *App) Run(ctx context.Context, inFilename, outFilename string) error {
+	sourceObj, err := source.ParseFile(inFilename)
 	if err != nil {
 		return errorsh.Wrap(err, "parse source file")
 	}
@@ -86,21 +84,21 @@ func (a *App) Run(ctx context.Context, filename string) error {
 			break
 		}
 
-		go func(link *source.Link) {
+		go func(linkIdx int, link *source.Link) {
 			defer sem.Release(1)
 
 			curValue := atomic.AddInt64(&counter, 1)
 			fmt.Printf("Gather facts [%d/%d] about '%s'\n", curValue, len(sourceObj.Links), link.URL)
 			facts, err := facts.GatherFacts(ctx, *link)
 			if err != nil {
-				log.Printf("fail to gather facts: %w", err)
+				log.Printf("fail to gather facts: %s", err)
 				return
 			}
 
 			linkFactsMu.Lock()
 			linkFacts[linkIdx] = *facts
 			linkFactsMu.Unlock()
-		}(link)
+		}(linkIdx, link)
 	}
 	if err := sem.Acquire(ctx, int64(a.opts.maxWorkers)); err != nil {
 		return errorsh.Wrap(err, "wait to workers finished")
@@ -176,7 +174,7 @@ func (a *App) Run(ctx context.Context, filename string) error {
 	return nil
 }
 
-func (a App) Render(ctx context.Context) error {
+func (a App) Render(ctx context.Context, outFilename string) error {
 	var sumObj sum.Sum
 	{
 		bb, err := os.ReadFile(outFilename)
