@@ -28,7 +28,9 @@ track changes across commits.
 
 ## Features
 
-- [ ] Gather facts for big awesome lists (rate limiters, auto-continue process)
+- [ ] Do not fetch github data with regular http client and github api client. In this case we should use only GitHub API client.
+- [ ] Parallel fact gathering
+- [x] Gather facts for big awesome lists (rate limiters, auto-continue process)
 - [ ] Render Markdown
 - [ ] Render HTML
 - [ ] Custom HTML template
