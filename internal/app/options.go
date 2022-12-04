@@ -15,10 +15,12 @@ type Options struct {
 
 	githubClient *github.Client
 
-	http *httph.Client
+	http       *httph.Client
+	maxWorkers int
 }
 
 var defaultOptions = Options{
 	responseTimeout: 30 * time.Second,
 	http:            just.Must(httph.New(httph.NewOptions())),
+	maxWorkers:      1,
 }

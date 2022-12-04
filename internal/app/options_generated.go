@@ -19,6 +19,7 @@ func NewOptions(
 	o.responseTimeout = defaultOptions.responseTimeout
 	o.githubClient = defaultOptions.githubClient
 	o.http = defaultOptions.http
+	o.maxWorkers = defaultOptions.maxWorkers
 
 	for _, opt := range options {
 		opt(&o)
@@ -41,6 +42,12 @@ func WithGithubClient(opt *github.Client) OptOptionsSetter {
 func WithHttp(opt *httph.Client) OptOptionsSetter {
 	return func(o *Options) {
 		o.http = opt
+	}
+}
+
+func WithMaxWorkers(opt int) OptOptionsSetter {
+	return func(o *Options) {
+		o.maxWorkers = opt
 	}
 }
 

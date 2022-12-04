@@ -31,6 +31,7 @@ func main() {
 	appInst, err := app.New(app.NewOptions(
 		app.WithGithubClient(github.NewClient(nil)),
 		app.WithHttp(httpClient),
+		app.WithMaxWorkers(10),
 	))
 	if err != nil {
 		panic(err)

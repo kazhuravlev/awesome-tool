@@ -7,6 +7,7 @@ require (
 	github.com/goccy/go-yaml v1.9.6
 	github.com/google/go-github/v48 v48.1.0
 	github.com/kazhuravlev/just v0.57.0
+	golang.org/x/sync v0.1.0
 	golang.org/x/time v0.2.0
 )
 
