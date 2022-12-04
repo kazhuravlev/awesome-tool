@@ -3,14 +3,14 @@ module github.com/kazhuravlev/awesome-tool
 go 1.19
 
 require (
-	github.com/davecgh/go-spew v1.1.1
+	github.com/PuerkitoBio/goquery v1.8.0
 	github.com/goccy/go-yaml v1.9.6
 	github.com/google/go-github/v48 v48.1.0
 	github.com/kazhuravlev/just v0.57.0
+	golang.org/x/time v0.2.0
 )
 
 require (
-	github.com/PuerkitoBio/goquery v1.8.0 // indirect
 	github.com/andybalholm/cascadia v1.3.1 // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
