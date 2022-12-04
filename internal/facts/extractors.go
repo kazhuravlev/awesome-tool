@@ -101,8 +101,12 @@ func (e *GitHub) Extract(ctx context.Context, link source.Link, facts *Data) (bo
 	return true, nil
 }
 
+type IHttpDoer interface {
+	Do(*http.Request) (*http.Response, error)
+}
+
 type Response struct {
-	Client  *http.Client
+	Client  IHttpDoer
 	Timeout time.Duration
 }
 
