@@ -1,6 +1,7 @@
 package facts
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"io"
@@ -9,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/google/go-github/v48/github"
 	"github.com/kazhuravlev/awesome-tool/internal/errorsh"
 	"github.com/kazhuravlev/awesome-tool/internal/source"
@@ -136,14 +138,27 @@ func (r *Response) Extract(ctx context.Context, link source.Link, facts *Data) (
 		return false, err
 	}
 
+	var htmlTitle, htmlDescription string
+	{
+		doc, err := goquery.NewDocumentFromReader(bytes.NewReader(body))
+		if err != nil {
+			// NOTE: ignore errors, because content type is not always HTML and
+			//  HTML is not always valid.
+		} else {
+			htmlTitle = doc.Find("html>head>title").First().Text()
+			htmlDescription = doc.Find("html>head>meta[name=description]").First().AttrOr("content", "")
+		}
+	}
+
 	duration := time.Since(start)
 
 	facts.Response = ResponseData{
-		Protocol:   [2]int{resp.ProtoMajor, resp.ProtoMinor},
-		Duration:   duration,
-		StatusCode: resp.StatusCode,
-		Body:       body,
-		Headers:    resp.Header,
+		Protocol:        [2]int{resp.ProtoMajor, resp.ProtoMinor},
+		Duration:        duration,
+		StatusCode:      resp.StatusCode,
+		HtmlTitle:       htmlTitle,
+		HtmlDescription: htmlDescription,
+		Headers:         resp.Header,
 	}
 	return true, nil
 }

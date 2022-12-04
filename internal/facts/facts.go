@@ -50,11 +50,12 @@ func (bs *ByteString) UnmarshalYAML(b []byte) error {
 
 type ResponseData struct {
 	// {2, 0} means http 2/0
-	Protocol   [2]int
-	Duration   time.Duration
-	StatusCode int
-	Body       ByteString
-	Headers    map[string][]string
+	Protocol        [2]int
+	Duration        time.Duration
+	StatusCode      int
+	HtmlTitle       string
+	HtmlDescription string
+	Headers         map[string][]string
 }
 
 type GithubData struct {
