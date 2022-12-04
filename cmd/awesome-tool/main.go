@@ -21,7 +21,7 @@ func main() {
 			return rate.NewLimiter(rate.Every(time.Second), 5)
 		}),
 		httph.WithRateLimitMap(map[string]*rate.Limiter{
-			"github.com": rate.NewLimiter(rate.Every(time.Second)/3, 2),
+			"github.com": rate.NewLimiter(rate.Every(time.Second)/1, 2),
 		}),
 	))
 	if err != nil {

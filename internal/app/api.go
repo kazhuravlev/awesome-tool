@@ -10,6 +10,7 @@ import (
 	"regexp"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"text/template"
 
 	"github.com/goccy/go-yaml"
@@ -76,6 +77,7 @@ func (a *App) Run(ctx context.Context, filename string) error {
 	linkFactsMu := new(sync.Mutex)
 	linkFacts := make(map[int]facts.Facts, len(sourceObj.Links))
 	sem := semaphore.NewWeighted(int64(a.opts.maxWorkers))
+	var counter int64
 	for linkIdx := range sourceObj.Links {
 		link := &sourceObj.Links[linkIdx]
 
@@ -87,7 +89,8 @@ func (a *App) Run(ctx context.Context, filename string) error {
 		go func(link *source.Link) {
 			defer sem.Release(1)
 
-			fmt.Printf("Gather facts about '%s'\n", link.URL)
+			curValue := atomic.AddInt64(&counter, 1)
+			fmt.Printf("Gather facts [%d/%d] about '%s'\n", curValue, len(sourceObj.Links), link.URL)
 			facts, err := facts.GatherFacts(ctx, *link)
 			if err != nil {
 				log.Printf("fail to gather facts: %w", err)
