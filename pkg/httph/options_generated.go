@@ -3,7 +3,6 @@ package httph
 
 import (
 	"net/http"
-	"sync"
 
 	"golang.org/x/time/rate"
 )
@@ -17,7 +16,6 @@ func NewOptions(
 
 	// Setting defaults from variable
 	o.client = defaultOptions.client
-	o.rateLimitMapMu = defaultOptions.rateLimitMapMu
 	o.rateLimitMap = defaultOptions.rateLimitMap
 	o.defaultRlConstructor = defaultOptions.defaultRlConstructor
 
@@ -30,12 +28,6 @@ func NewOptions(
 func WithClient(opt *http.Client) OptOptionsSetter {
 	return func(o *Options) {
 		o.client = opt
-	}
-}
-
-func WithRateLimitMapMu(opt *sync.Mutex) OptOptionsSetter {
-	return func(o *Options) {
-		o.rateLimitMapMu = opt
 	}
 }
 

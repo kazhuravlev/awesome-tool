@@ -2,6 +2,7 @@ package httph
 
 import (
 	"net/http"
+	"sync"
 
 	"github.com/kazhuravlev/awesome-tool/internal/errorsh"
 	"golang.org/x/time/rate"
@@ -9,6 +10,8 @@ import (
 
 type Client struct {
 	opts Options
+
+	rateLimitMapMu *sync.Mutex
 }
 
 func New(opts Options) (*Client, error) {
@@ -16,7 +19,10 @@ func New(opts Options) (*Client, error) {
 		return nil, errorsh.Wrap(err, "bad configuration")
 	}
 
-	return &Client{opts: opts}, nil
+	return &Client{
+		opts:           opts,
+		rateLimitMapMu: new(sync.Mutex),
+	}, nil
 }
 
 func (c *Client) Do(req *http.Request) (*http.Response, error) {
@@ -25,8 +31,8 @@ func (c *Client) Do(req *http.Request) (*http.Response, error) {
 	hostname := req.URL.Hostname()
 	var rl *rate.Limiter
 	func() {
-		c.opts.rateLimitMapMu.Lock()
-		defer c.opts.rateLimitMapMu.Unlock()
+		c.rateLimitMapMu.Lock()
+		defer c.rateLimitMapMu.Unlock()
 
 		rateLimiter, ok := c.opts.rateLimitMap[hostname]
 		if !ok {
@@ -42,5 +48,5 @@ func (c *Client) Do(req *http.Request) (*http.Response, error) {
 		return nil, err
 	}
 
-	return c.client.Do(req)
+	return c.opts.client.Do(req)
 }

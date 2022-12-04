@@ -2,7 +2,7 @@ package httph
 
 import (
 	"net/http"
-	"sync"
+	"time"
 
 	"golang.org/x/time/rate"
 )
@@ -11,10 +11,13 @@ import (
 type Options struct {
 	client *http.Client
 
-	rateLimitMapMu *sync.Mutex
-	rateLimitMap   map[string]*rate.Limiter
+	rateLimitMap map[string]*rate.Limiter
 
 	defaultRlConstructor func() *rate.Limiter
 }
 
-var defaultOptions = Options{}
+var defaultOptions = Options{
+	client:               http.DefaultClient,
+	rateLimitMap:         make(map[string]*rate.Limiter),
+	defaultRlConstructor: func() *rate.Limiter { return rate.NewLimiter(rate.Every(time.Second), 5) },
+}
