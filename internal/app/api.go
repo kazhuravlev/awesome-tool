@@ -168,10 +168,6 @@ func (a *App) Run(ctx context.Context, inFilename, outFilename string) error {
 		}
 	}
 
-	//fmt.Println(sumObj)
-	// [ ] Apply rules
-	// [ ] Render template + data
-
 	return nil
 }
 
@@ -193,38 +189,7 @@ func (a App) Render(ctx context.Context, outFilename, readmeFilename string) err
 		return errorsh.Wrap(err, "read template")
 	}
 
-	tmpl, err := template.New("readme.md").Funcs(template.FuncMap{
-		"anchor": func(s string) string {
-			return strings.Trim(reAnchor.ReplaceAllString(strings.ToLower(s), "-"), " -")
-		},
-		"add": func(n, x int) int {
-			return n + x
-		},
-		"repeat": func(s string, n int) string {
-			buf := bytes.NewBuffer(nil)
-			for i := 0; i < n; i++ {
-				buf.WriteString(s)
-			}
-
-			return buf.String()
-		},
-		"dict": func(values ...any) (map[string]any, error) {
-			if len(values)%2 != 0 {
-				return nil, errorsh.Newf("invalid dict call")
-			}
-
-			dict := make(map[string]any, len(values)/2)
-			for i := 0; i < len(values); i += 2 {
-				key, ok := values[i].(string)
-				if !ok {
-					return nil, errorsh.Newf("dict keys must be strings")
-				}
-				dict[key] = values[i+1]
-			}
-
-			return dict, nil
-		},
-	}).Parse(string(bb))
+	tmpl, err := template.New("readme.md").Funcs(tplFuncLib).Parse(string(bb))
 	if err != nil {
 		return errorsh.Wrap(err, "parse readme template")
 	}
