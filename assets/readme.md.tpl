@@ -1,4 +1,4 @@
-# Table of Contents
+# Contents
 
 {{range .Groups -}}
 {{template "RenderTOC" dict "Group" . "Lvl" 0}}
@@ -29,6 +29,10 @@ _{{.Group.SrcGroup.Description.Val}}_
 {{template "RenderGroup" dict "Group" . "Lvl" (add $lvl 1)}}
 {{end}}
 {{- end }}
+
+{{if eq .Lvl 2 -}}
+[⬆ back to top](#{{anchor "Contents"}})
+{{- end}}
 {{- end}}
 
 
