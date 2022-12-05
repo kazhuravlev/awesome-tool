@@ -137,7 +137,7 @@ func (a *App) Run(ctx context.Context, inFilename, outFilename string) error {
 					return linkFacts[linkIdx].Collected[factName]
 				})
 				if !allFactsIsCollected {
-					fmt.Println(link.Title, ":", rule.Name, check.Name(), ":", false, []string{"not all facts is collected"})
+					fmt.Println(link.URL, ":", rule.Name, check.Name(), ":", false, []string{"not all facts is collected"})
 					// FIXME: add mark about dependency check
 					linkChecks["__deps__"] = rules.CheckResult{
 						CheckName: "Dependency check",
@@ -148,7 +148,7 @@ func (a *App) Run(ctx context.Context, inFilename, outFilename string) error {
 				}
 
 				checkResult := check.Test(link, linkFacts[linkIdx])
-				fmt.Println(link.Title, ":", rule.Name, check.Name(), ":", checkResult)
+				fmt.Println(link.URL, ":", rule.Name, check.Name(), ":", checkResult)
 				linkChecks[checkStringRaw] = checkResult
 			}
 		}
@@ -162,8 +162,6 @@ func (a *App) Run(ctx context.Context, inFilename, outFilename string) error {
 		if err != nil {
 			return errorsh.Wrap(err, "marshal sum object")
 		}
-
-		fmt.Println(string(sumYaml))
 
 		if err := ioutil.WriteFile(outFilename, sumYaml, 0644); err != nil {
 			return errorsh.Wrap(err, "write sum file")

@@ -18,6 +18,7 @@ func NewOptions(
 	o.client = defaultOptions.client
 	o.rateLimitMap = defaultOptions.rateLimitMap
 	o.defaultRlConstructor = defaultOptions.defaultRlConstructor
+	o.maxEquivRedirects = defaultOptions.maxEquivRedirects
 
 	for _, opt := range options {
 		opt(&o)
@@ -40,6 +41,12 @@ func WithRateLimitMap(opt map[string]*rate.Limiter) OptOptionsSetter {
 func WithDefaultRlConstructor(opt func() *rate.Limiter) OptOptionsSetter {
 	return func(o *Options) {
 		o.defaultRlConstructor = opt
+	}
+}
+
+func WithMaxEquivRedirects(opt int) OptOptionsSetter {
+	return func(o *Options) {
+		o.maxEquivRedirects = opt
 	}
 }
 

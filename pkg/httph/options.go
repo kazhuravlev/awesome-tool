@@ -14,10 +14,12 @@ type Options struct {
 	rateLimitMap map[string]*rate.Limiter
 
 	defaultRlConstructor func() *rate.Limiter
+	maxEquivRedirects    int
 }
 
 var defaultOptions = Options{
 	client:               http.DefaultClient,
 	rateLimitMap:         make(map[string]*rate.Limiter),
 	defaultRlConstructor: func() *rate.Limiter { return rate.NewLimiter(rate.Every(time.Second), 5) },
+	maxEquivRedirects:    3,
 }
