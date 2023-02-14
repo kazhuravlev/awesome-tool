@@ -34,6 +34,7 @@ track changes across commits.
 - [ ] Render Markdown
 - [ ] Render HTML
 - [ ] Custom HTML template
+  - [ ] Custom CSS
 - [ ] Track all changes with `.sum` file
 - [ ] Check links (http statuses)
 - [ ] Fetch data for GitHub repos 
@@ -46,4 +47,18 @@ track changes across commits.
   - [ ] On GitHub counters 
   - [ ] On last commit
   - [ ] On http statuses
+- [ ] Microformats and meta
+  - [ ] Twitter cards
+  - [ ] OpenGraph
+  - [ ] Keywords, description
+- [ ] Advertisement
+  - [ ] Link, Title, Description, Logo, URL, Priority
+  - [ ] Links in head/links in footer/links everywhere/
+  - [ ] Google Ads
+- [ ] Trackers and pixels
+  - [ ] Google, FB, etc
+  - [ ] Auto-add utm_source to external links
+  - [ ] rel=nofollow
+- [ ] Manifest.json
+- [ ] Create separate pages
 
