@@ -8,7 +8,6 @@ import (
 	"log"
 	"os"
 	"regexp"
-	"strings"
 	"sync"
 	"sync/atomic"
 	"text/template"
@@ -184,7 +183,7 @@ func (a App) Render(ctx context.Context, outFilename, readmeFilename string) err
 		}
 	}
 
-	bb, err := assets.FS.ReadFile("readme.md.tpl")
+	bb, err := assets.FS.ReadFile("readme.go.tpl")
 	if err != nil {
 		return errorsh.Wrap(err, "read template")
 	}
