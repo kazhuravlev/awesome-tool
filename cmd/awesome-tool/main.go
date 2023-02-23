@@ -14,9 +14,19 @@ import (
 	"golang.org/x/time/rate"
 )
 
-const inFilename = "./examples/basic/data.yaml"
-const outFilename = "./sum.yaml"
-const outReadme = "./sum_readme.md"
+// Argument names
+const (
+	optSpecFilename      = "spec-file"
+	optSumFilename       = "sum-file"
+	optOutReadmeFilename = "out-readme"
+)
+
+// Default argument values
+const (
+	optDefaultSpecFilename      = "./examples/basic/data.yaml"
+	optDefaultSumFilename       = "./sum.yaml"
+	optDefaultOutReadmeFilename = "./sum_readme.md"
+)
 
 func main() {
 	app := &cli.App{ //nolint:exhaustruct
@@ -26,11 +36,35 @@ func main() {
 				Name:        "build",
 				Description: "Build sum file from source",
 				Action:      cmdBuild,
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:     optSpecFilename,
+						Value:    optDefaultSpecFilename,
+						Required: false,
+					},
+					&cli.StringFlag{
+						Name:     optSumFilename,
+						Value:    optDefaultSumFilename,
+						Required: false,
+					},
+				},
 			},
 			{
 				Name:        "render",
 				Description: "Render sum file into template",
 				Action:      cmdRender,
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:     optSumFilename,
+						Value:    optDefaultSumFilename,
+						Required: false,
+					},
+					&cli.StringFlag{
+						Name:     optOutReadmeFilename,
+						Value:    optDefaultOutReadmeFilename,
+						Required: false,
+					},
+				},
 			},
 		},
 	}
@@ -74,7 +108,10 @@ func cmdBuild(c *cli.Context) error {
 		return errorsh.Wrap(err, "create application instance")
 	}
 
-	if err := appInst.Run(ctx, inFilename, outFilename); err != nil {
+	valSpecFilename := c.String(optSpecFilename)
+	valSumFilename := c.String(optSumFilename)
+
+	if err := appInst.Run(ctx, valSpecFilename, valSumFilename); err != nil {
 		return errorsh.Wrap(err, "build sum")
 	}
 
@@ -90,7 +127,10 @@ func cmdRender(c *cli.Context) error {
 		return errorsh.Wrap(err, "create application instance")
 	}
 
-	if err := appInst.Render(ctx, outFilename, outReadme); err != nil {
+	valSumFilename := c.String(optSumFilename)
+	valOutReadmeFilename := c.String(optOutReadmeFilename)
+
+	if err := appInst.Render(ctx, valSumFilename, valOutReadmeFilename); err != nil {
 		return errorsh.Wrap(err, "render templates")
 	}
 
