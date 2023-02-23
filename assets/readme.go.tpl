@@ -41,7 +41,7 @@ _{{.Group.SrcGroup.Description.Val}}_
 {{define "RenderTOC" -}}
 {{- $lvl := .Lvl -}}
 
-{{repeat " " .Lvl}}- [{{.Group.SrcGroup.Title}}](#{{anchor .Group.SrcGroup.Title}})
+{{repeat "  " .Lvl}}- [{{.Group.SrcGroup.Title}}](#{{anchor .Group.SrcGroup.Title}})
 {{range .Group.Groups -}}
 {{template "RenderTOC" dict "Group" . "Lvl" (add $lvl 1)}}
 {{- end }}
