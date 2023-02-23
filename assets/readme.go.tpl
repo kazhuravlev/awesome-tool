@@ -4,12 +4,10 @@
 {{template "RenderTOC" dict "Group" . "Lvl" 0}}
 {{- end}}
 {{range .Groups -}}
-{{template "RenderGroup" dict "Group" . "Lvl" 2}}
-
+{{ if .IsPresentInResult }}
+{{ template "RenderGroup" dict "Group" . "Lvl" 2 }}
+{{ end }}
 {{ end}}
-
-
-
 
 
 {{define "RenderGroup" -}}
@@ -36,13 +34,13 @@ _{{.Group.SrcGroup.Description.Val}}_
 {{- end}}
 
 
-
-
 {{define "RenderTOC" -}}
+{{if .Group.IsPresentInResult}}
 {{- $lvl := .Lvl -}}
 
 {{repeat "  " .Lvl}}- [{{.Group.SrcGroup.Title}}](#{{anchor .Group.SrcGroup.Title}})
 {{range .Group.Groups -}}
 {{template "RenderTOC" dict "Group" . "Lvl" (add $lvl 1)}}
-{{- end }}
-{{- end }}
+{{- end}}
+{{- end}}
+{{- end}}
