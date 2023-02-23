@@ -24,7 +24,7 @@ func Build(
 
 	groups := make([]Group, 0, len(src.Groups))
 	for _, group := range src.Groups {
-		// We need only root groups
+		// We need only root groups, so we skip groups, that has parent group.
 		if group.Group.Valid {
 			continue
 		}
@@ -86,9 +86,12 @@ func handleGroup(
 		childGroups = append(childGroups, handleGroup(src, group, linksRules, linksFacts, linksChecks))
 	}
 
+	linksCountRecursive := len(groupLinks) + getLinksCountRecursive(childGroups...)
 	return Group{
-		SrcGroup: g,
-		Groups:   childGroups,
-		Links:    groupLinks,
+		SrcGroup:            g,
+		Groups:              childGroups,
+		Links:               groupLinks,
+		LinksCountRecursive: linksCountRecursive,
+		IsPresentInResult:   linksCountRecursive > 0 || g.AlwaysShown,
 	}
 }

@@ -16,6 +16,9 @@ type Group struct {
 	SrcGroup source.Group
 	Groups   []Group
 	Links    []Link
+	// Contains count of links for this group and all children groups
+	LinksCountRecursive int
+	IsPresentInResult bool
 }
 
 type Link struct {
