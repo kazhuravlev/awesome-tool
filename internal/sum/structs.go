@@ -18,6 +18,7 @@ type Group struct {
 	Links    []Link
 	// Contains count of links for this group and all children groups
 	LinksCountRecursive int
+	// Allow to render group in output
 	IsPresentInResult bool
 }
 
@@ -25,6 +26,9 @@ type Link struct {
 	SrcLink source.Link
 	Rules   []Rule
 	Facts   facts.Facts
+
+	// Resulted title
+	Title string
 }
 
 type Rule struct {

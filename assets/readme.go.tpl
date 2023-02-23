@@ -18,7 +18,7 @@ _{{.Group.SrcGroup.Description.Val}}_
 {{- end}}
 
 {{range .Group.Links -}}
-- [{{.Facts.Data.Meta.Title}}]({{.SrcLink.URL}})
+- [{{.Title}}]({{.SrcLink.URL}})
 {{end}}
 
 {{- if .Group.Groups -}}

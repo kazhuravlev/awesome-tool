@@ -5,6 +5,7 @@ import (
 	"github.com/kazhuravlev/awesome-tool/internal/rules"
 	"github.com/kazhuravlev/awesome-tool/internal/source"
 	"github.com/kazhuravlev/just"
+	"strings"
 )
 
 const Version = "1"
@@ -70,10 +71,30 @@ func handleGroup(
 			}
 		}
 
+		linkFacts := linksFacts[linkIdx]
+
+		linkTitles := []string{
+			link.Title,
+			linkFacts.Data.Github.Name,
+			linkFacts.Data.Meta.Title,
+			linkFacts.Data.Response.HtmlTitle,
+			linkFacts.Data.Url.Hostname,
+			"Has no title",
+		}
+
+		linkTitles = just.SliceMap(linkTitles, func(title string) string {
+			return strings.ReplaceAll(strings.TrimSpace(title), "\n", "_")
+		})
+
+		linkTitle := just.SliceFindFirst(linkTitles, func(_ int, title string) bool {
+			return title != ""
+		}).Val
+
 		groupLinks = append(groupLinks, Link{
 			SrcLink: link,
 			Rules:   linkRules,
-			Facts:   linksFacts[linkIdx],
+			Facts:   linkFacts,
+			Title:   linkTitle,
 		})
 	}
 
@@ -87,6 +108,7 @@ func handleGroup(
 	}
 
 	linksCountRecursive := len(groupLinks) + getLinksCountRecursive(childGroups...)
+
 	return Group{
 		SrcGroup:            g,
 		Groups:              childGroups,
