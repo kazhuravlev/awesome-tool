@@ -7,6 +7,7 @@ import (
 	"github.com/kazhuravlev/awesome-tool/pkg/yamlh"
 	"io/ioutil"
 	"log"
+	"os"
 	"regexp"
 	"sync"
 	"sync/atomic"
@@ -191,7 +192,7 @@ func (a App) Render(ctx context.Context, outFilename, readmeFilename string) err
 		return errorsh.Wrap(err, "exec template")
 	}
 
-	if err := ioutil.WriteFile(readmeFilename, buf.Bytes(), 0644); err != nil {
+	if err := os.WriteFile(readmeFilename, buf.Bytes(), 0644); err != nil {
 		return errorsh.Wrap(err, "write result readme file")
 	}
 
