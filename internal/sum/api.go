@@ -22,19 +22,19 @@ func Build(
 		}
 	}
 
-	groups2 := make([]Group, 0, len(src.Groups))
+	groups := make([]Group, 0, len(src.Groups))
 	for _, group := range src.Groups {
 		// We need only root groups
 		if group.Group.Valid {
 			continue
 		}
 
-		groups2 = append(groups2, handleGroup(src, group, linksRules, linksFacts, linksChecks))
+		groups = append(groups, handleGroup(src, group, linksRules, linksFacts, linksChecks))
 	}
 
 	return Sum{
 		Version: Version,
-		Groups:  groups2,
+		Groups:  groups,
 	}
 }
 
