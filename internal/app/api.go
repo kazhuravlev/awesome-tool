@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/kazhuravlev/awesome-tool/pkg/yamlh"
 	"io/ioutil"
 	"log"
-	"os"
 	"regexp"
 	"sync"
 	"sync/atomic"
@@ -172,15 +172,8 @@ func (a *App) Run(ctx context.Context, inFilename, outFilename string) error {
 
 func (a App) Render(ctx context.Context, outFilename, readmeFilename string) error {
 	var sumObj sum.Sum
-	{
-		bb, err := os.ReadFile(outFilename)
-		if err != nil {
-			return errorsh.Wrap(err, "read file")
-		}
-
-		if err := yaml.Unmarshal(bb, &sumObj); err != nil {
-			return errorsh.Wrap(err, "unmarshal sum fil")
-		}
+	if err := yamlh.UnmarshalFile(outFilename, &sumObj); err != nil {
+		return errorsh.Wrap(err, "unmarshal sum file")
 	}
 
 	bb, err := assets.FS.ReadFile("readme.go.tpl")

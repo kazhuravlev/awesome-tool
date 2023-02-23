@@ -3,22 +3,23 @@ package source
 import (
 	"errors"
 	"fmt"
+	"github.com/kazhuravlev/awesome-tool/pkg/yamlh"
 
 	"github.com/kazhuravlev/awesome-tool/internal/errorsh"
 	"github.com/kazhuravlev/just"
 )
 
 func ParseFile(filename string) (*Source, error) {
-	obj, err := unmarshalFilename(filename)
-	if err != nil {
-		return nil, errorsh.Wrap(err, "unmarshal filename")
+	var obj Source
+	if err := yamlh.UnmarshalFile(filename, &obj); err != nil {
+		return nil, errorsh.Wrap(err, "unmarshal source file")
 	}
 
 	if obj.Version != "1" {
 		return nil, errors.New("unknown source file version")
 	}
 
-	return obj, nil
+	return &obj, nil
 }
 
 func Validate(obj Source) error {
