@@ -62,4 +62,7 @@ track changes across commits.
     - [ ] rel=nofollow
 - [ ] Manifest.json
 - [ ] Create separate pages
-
+- [ ] Auto group links in category by
+    - [ ] First name of link
+    - [ ] Domain name
+    - [ ] ...???
