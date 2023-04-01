@@ -20,6 +20,7 @@ func NewOptions(
 	o.githubClient = defaultOptions.githubClient
 	o.http = defaultOptions.http
 	o.maxWorkers = defaultOptions.maxWorkers
+	o.sumEncoder = defaultOptions.sumEncoder
 
 	for _, opt := range options {
 		opt(&o)
@@ -48,6 +49,12 @@ func WithHttp(opt *httph.Client) OptOptionsSetter {
 func WithMaxWorkers(opt int) OptOptionsSetter {
 	return func(o *Options) {
 		o.maxWorkers = opt
+	}
+}
+
+func WithSumEncoder(opt Encoder) OptOptionsSetter {
+	return func(o *Options) {
+		o.sumEncoder = opt
 	}
 }
 

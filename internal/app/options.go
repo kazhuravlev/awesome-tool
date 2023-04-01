@@ -8,6 +8,14 @@ import (
 	"github.com/kazhuravlev/just"
 )
 
+type Encoder interface {
+	Marshal(any) ([]byte, error)
+	Unmarshal([]byte, any) error
+
+	MarshalFile(string, any) error
+	UnmarshalFile(string, any) error
+}
+
 //go:generate options-gen -from-struct=Options -defaults-from=var
 
 type Options struct {
@@ -17,10 +25,12 @@ type Options struct {
 
 	http       *httph.Client
 	maxWorkers int
+	sumEncoder Encoder
 }
 
 var defaultOptions = Options{
 	responseTimeout: 30 * time.Second,
 	http:            just.Must(httph.New(httph.NewOptions())),
 	maxWorkers:      1,
+	sumEncoder:      YamlEncoder{},
 }
