@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/kazhuravlev/awesome-tool/pkg/yamlh"
 	"io/ioutil"
-	"log"
 	"os"
 	"regexp"
 	"sync"
@@ -87,7 +86,7 @@ func (a *App) Run(ctx context.Context, inFilename, outFilename string) error {
 		link := &sourceObj.Links[linkIdx]
 
 		if err := sem.Acquire(ctx, 1); err != nil {
-			log.Printf("Failed to acquire semaphore: %v", err)
+			fmt.Printf("Failed to acquire semaphore: %v\n", err)
 			break
 		}
 
@@ -98,7 +97,7 @@ func (a *App) Run(ctx context.Context, inFilename, outFilename string) error {
 			fmt.Printf("Gather facts [%d/%d] about '%s'\n", curValue, len(sourceObj.Links), link.URL)
 			facts, err := facts.GatherFacts(ctx, *link)
 			if err != nil {
-				log.Printf("fail to gather facts: %s", err)
+				fmt.Printf("fail to gather facts: %s\n", err)
 				return
 			}
 
