@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"github.com/gofri/go-github-ratelimit/github_ratelimit"
+	"golang.org/x/oauth2"
 	"log"
 	"os"
 	"path/filepath"
@@ -20,6 +22,7 @@ const (
 	optSpecFilename      = "spec-file"
 	optSumFilename       = "sum-file"
 	optOutReadmeFilename = "out-readme"
+	optGithubAccessToken = "github-token"
 )
 
 // Default argument values
@@ -38,6 +41,11 @@ func main() {
 				Description: "Build sum file from source",
 				Action:      cmdBuild,
 				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:     optGithubAccessToken,
+						Value:    "",
+						Required: false,
+					},
 					&cli.StringFlag{
 						Name:     optSpecFilename,
 						Value:    optDefaultSpecFilename,
@@ -76,6 +84,8 @@ func main() {
 }
 
 func helpCreateApp(c *cli.Context) (*app.App, error) {
+	githubAccessToken := c.String(optGithubAccessToken)
+
 	httpClient, err := httph.New(httph.NewOptions(
 		httph.WithDefaultRlConstructor(func() *rate.Limiter {
 			return rate.NewLimiter(rate.Every(time.Second), 5)
@@ -98,8 +108,22 @@ func helpCreateApp(c *cli.Context) (*app.App, error) {
 		encoder = app.JsonEncoder{}
 	}
 
+	github_ratelimit.NewRateLimitWaiterClient(oauth2.NewClient(
+		context.TODO(),
+		oauth2.StaticTokenSource(
+			&oauth2.Token{AccessToken: githubAccessToken},
+		),
+	).Transport)
 	appInst, err := app.New(app.NewOptions(
-		app.WithGithubClient(github.NewClient(nil)),
+		app.WithGithubClient(
+			github.NewClient(
+				oauth2.NewClient(
+					context.TODO(),
+					oauth2.StaticTokenSource(
+						&oauth2.Token{AccessToken: githubAccessToken},
+					),
+				),
+			),
 		app.WithHttp(httpClient),
 		app.WithMaxWorkers(10),
 		app.WithSumEncoder(encoder),
