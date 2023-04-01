@@ -1,6 +1,8 @@
 package assets
 
-import "embed"
+import (
+	"embed"
+)
 
-//go:embed *
+//go:embed *.tpl
 var FS embed.FS
