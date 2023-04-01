@@ -161,12 +161,7 @@ func (a *App) Run(ctx context.Context, inFilename, outFilename string) error {
 
 	{
 		sumObj := sum.Build(*sourceObj, linksRules, linkFacts, linksChecks)
-		sumYaml, err := yaml.Marshal(sumObj)
-		if err != nil {
-			return errorsh.Wrap(err, "marshal sum object")
-		}
-
-		if err := ioutil.WriteFile(outFilename, sumYaml, 0644); err != nil {
+		if err := a.opts.sumEncoder.MarshalFile(outFilename, sumObj); err != nil {
 			return errorsh.Wrap(err, "write sum file")
 		}
 	}
@@ -176,7 +171,7 @@ func (a *App) Run(ctx context.Context, inFilename, outFilename string) error {
 
 func (a App) Render(ctx context.Context, sumFilename, readmeFilename string) error {
 	var sumObj sum.Sum
-	if err := yamlh.UnmarshalFile(sumFilename, &sumObj); err != nil {
+	if err := a.opts.sumEncoder.UnmarshalFile(sumFilename, &sumObj); err != nil {
 		return errorsh.Wrap(err, "unmarshal sum file")
 	}
 

@@ -19,3 +19,17 @@ func UnmarshalFile(filename string, obj any) error {
 
 	return nil
 }
+
+// MarshalFile helps to write file with contents of marshalled obj.
+func MarshalFile(filename string, obj any) error {
+	bb, err := yaml.Marshal(obj)
+	if err != nil {
+		return errorsh.Wrap(err, "marshal")
+	}
+
+	if err := os.WriteFile(filename, bb, 0o0644); err != nil {
+		return errorsh.Wrap(err, "write file")
+	}
+
+	return nil
+}
