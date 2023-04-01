@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/google/go-github/v48/github"
@@ -74,7 +75,7 @@ func main() {
 	}
 }
 
-func helpCreateApp() (*app.App, error) {
+func helpCreateApp(c *cli.Context) (*app.App, error) {
 	httpClient, err := httph.New(httph.NewOptions(
 		httph.WithDefaultRlConstructor(func() *rate.Limiter {
 			return rate.NewLimiter(rate.Every(time.Second), 5)
@@ -87,10 +88,21 @@ func helpCreateApp() (*app.App, error) {
 		return nil, errorsh.Wrap(err, "create http instance")
 	}
 
+	var encoder app.Encoder
+	switch ext := filepath.Ext(c.String(optSumFilename)); ext {
+	default:
+		return nil, errorsh.Newf("unknown out-sum filename extension: %s", ext)
+	case ".yaml":
+		encoder = app.YamlEncoder{}
+	case ".json":
+		encoder = app.JsonEncoder{}
+	}
+
 	appInst, err := app.New(app.NewOptions(
 		app.WithGithubClient(github.NewClient(nil)),
 		app.WithHttp(httpClient),
 		app.WithMaxWorkers(10),
+		app.WithSumEncoder(encoder),
 	))
 	if err != nil {
 		return nil, errorsh.Wrap(err, "create app instance")
@@ -103,7 +115,7 @@ func cmdBuild(c *cli.Context) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	appInst, err := helpCreateApp()
+	appInst, err := helpCreateApp(c)
 	if err != nil {
 		return errorsh.Wrap(err, "create application instance")
 	}
@@ -122,7 +134,7 @@ func cmdRender(c *cli.Context) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	appInst, err := helpCreateApp()
+	appInst, err := helpCreateApp(c)
 	if err != nil {
 		return errorsh.Wrap(err, "create application instance")
 	}
