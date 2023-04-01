@@ -24,6 +24,10 @@ import (
 	"golang.org/x/sync/semaphore"
 )
 
+var (
+	tplReadme = just.Must(template.New("readme.md").Funcs(tplFuncLib).Parse(string(just.Must(assets.FS.ReadFile("readme.go.tpl")))))
+)
+
 var reAnchor = regexp.MustCompile(`[^a-z0-9]+`)
 
 type App struct {
@@ -177,18 +181,8 @@ func (a App) Render(ctx context.Context, outFilename, readmeFilename string) err
 		return errorsh.Wrap(err, "unmarshal sum file")
 	}
 
-	bb, err := assets.FS.ReadFile("readme.go.tpl")
-	if err != nil {
-		return errorsh.Wrap(err, "read template")
-	}
-
-	tmpl, err := template.New("readme.md").Funcs(tplFuncLib).Parse(string(bb))
-	if err != nil {
-		return errorsh.Wrap(err, "parse readme template")
-	}
-
 	buf := bytes.NewBuffer(nil)
-	if err := tmpl.Execute(buf, sumObj); err != nil {
+	if err := tplReadme.Execute(buf, sumObj); err != nil {
 		return errorsh.Wrap(err, "exec template")
 	}
 
