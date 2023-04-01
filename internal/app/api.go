@@ -175,9 +175,9 @@ func (a *App) Run(ctx context.Context, inFilename, outFilename string) error {
 	return nil
 }
 
-func (a App) Render(ctx context.Context, outFilename, readmeFilename string) error {
+func (a App) Render(ctx context.Context, sumFilename, readmeFilename string) error {
 	var sumObj sum.Sum
-	if err := yamlh.UnmarshalFile(outFilename, &sumObj); err != nil {
+	if err := yamlh.UnmarshalFile(sumFilename, &sumObj); err != nil {
 		return errorsh.Wrap(err, "unmarshal sum file")
 	}
 
