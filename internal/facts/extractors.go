@@ -137,13 +137,13 @@ func (r *Response) Extract(ctx context.Context, link source.Link, facts *Data) (
 
 	resp, err := r.Client.Do(req)
 	if err != nil {
-		return false, err
+		return false, errorsh.Wrap(err, "do a http request")
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return false, err
+		return false, errorsh.Wrap(err, "read response")
 	}
 
 	var htmlTitle, htmlDescription string
@@ -168,6 +168,7 @@ func (r *Response) Extract(ctx context.Context, link source.Link, facts *Data) (
 		HtmlDescription: strings.TrimSpace(htmlDescription),
 		Headers:         filterAdaptHeaders(resp.Header),
 	}
+
 	return true, nil
 }
 

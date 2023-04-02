@@ -29,7 +29,7 @@ type Options struct {
 }
 
 var defaultOptions = Options{
-	responseTimeout: 30 * time.Second,
+	responseTimeout: 60 * time.Second,
 	http:            just.Must(httph.New(httph.NewOptions())),
 	maxWorkers:      1,
 	sumEncoder:      YamlEncoder{},

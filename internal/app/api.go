@@ -4,12 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"os"
-	"regexp"
-	"sync"
-	"sync/atomic"
-	"text/template"
-
 	"github.com/kazhuravlev/awesome-tool/assets"
 	"github.com/kazhuravlev/awesome-tool/internal/errorsh"
 	"github.com/kazhuravlev/awesome-tool/internal/facts"
@@ -18,6 +12,11 @@ import (
 	"github.com/kazhuravlev/awesome-tool/internal/sum"
 	"github.com/kazhuravlev/just"
 	"golang.org/x/sync/semaphore"
+	"os"
+	"regexp"
+	"sync"
+	"sync/atomic"
+	"text/template"
 )
 
 var (
@@ -103,6 +102,7 @@ func (a *App) Run(ctx context.Context, inFilename, outFilename string) error {
 			linkFactsMu.Unlock()
 		}(linkIdx, link)
 	}
+
 	if err := sem.Acquire(ctx, int64(a.opts.maxWorkers)); err != nil {
 		return errorsh.Wrap(err, "wait to workers finished")
 	}
