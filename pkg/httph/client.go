@@ -4,21 +4,16 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/PuerkitoBio/goquery"
+	"github.com/kazhuravlev/awesome-tool/internal/errorsh"
 	"io"
 	"net/http"
 	"net/url"
 	"regexp"
-	"sync"
-
-	"github.com/PuerkitoBio/goquery"
-	"github.com/kazhuravlev/awesome-tool/internal/errorsh"
-	"golang.org/x/time/rate"
 )
 
 type Client struct {
 	opts Options
-
-	rateLimitMapMu *sync.Mutex
 }
 
 func New(opts Options) (*Client, error) {
@@ -28,7 +23,6 @@ func New(opts Options) (*Client, error) {
 
 	return &Client{
 		opts:           opts,
-		rateLimitMapMu: new(sync.Mutex),
 	}, nil
 }
 
@@ -39,26 +33,6 @@ func (c *Client) Do(req *http.Request) (*http.Response, error) {
 	equivRedirectNum := 0
 	if val, ok := ctx.Value(ctxKeyEquivRedirectNum).(int); ok {
 		equivRedirectNum = val
-	}
-
-	hostname := req.URL.Hostname()
-	var rl *rate.Limiter
-	func() {
-		c.rateLimitMapMu.Lock()
-		defer c.rateLimitMapMu.Unlock()
-
-		rateLimiter, ok := c.opts.rateLimitMap[hostname]
-		if !ok {
-			rl = c.opts.defaultRlConstructor()
-			return
-		}
-
-		c.opts.rateLimitMap[hostname] = rateLimiter
-		rl = rateLimiter
-	}()
-
-	if err := rl.Wait(ctx); err != nil {
-		return nil, err
 	}
 
 	resp, err := c.opts.client.Do(req)

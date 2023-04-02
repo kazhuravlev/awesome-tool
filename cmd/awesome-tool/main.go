@@ -3,18 +3,15 @@ package main
 import (
 	"context"
 	"github.com/gofri/go-github-ratelimit/github_ratelimit"
-	"golang.org/x/oauth2"
-	"log"
-	"os"
-	"path/filepath"
-	"time"
-
 	"github.com/google/go-github/v48/github"
 	"github.com/kazhuravlev/awesome-tool/internal/app"
 	"github.com/kazhuravlev/awesome-tool/internal/errorsh"
 	"github.com/kazhuravlev/awesome-tool/pkg/httph"
 	"github.com/urfave/cli/v3"
-	"golang.org/x/time/rate"
+	"golang.org/x/oauth2"
+	"log"
+	"os"
+	"path/filepath"
 )
 
 // Argument names
@@ -86,14 +83,7 @@ func main() {
 func helpCreateApp(c *cli.Context) (*app.App, error) {
 	githubAccessToken := c.String(optGithubAccessToken)
 
-	httpClient, err := httph.New(httph.NewOptions(
-		httph.WithDefaultRlConstructor(func() *rate.Limiter {
-			return rate.NewLimiter(rate.Every(time.Second), 5)
-		}),
-		httph.WithRateLimitMap(map[string]*rate.Limiter{
-			"github.com": rate.NewLimiter(rate.Every(time.Minute), 1),
-		}),
-	))
+	httpClient, err := httph.New(httph.NewOptions())
 	if err != nil {
 		return nil, errorsh.Wrap(err, "create http instance")
 	}

@@ -3,8 +3,6 @@ package httph
 
 import (
 	"net/http"
-
-	"golang.org/x/time/rate"
 )
 
 type OptOptionsSetter func(o *Options)
@@ -16,8 +14,6 @@ func NewOptions(
 
 	// Setting defaults from variable
 	o.client = defaultOptions.client
-	o.rateLimitMap = defaultOptions.rateLimitMap
-	o.defaultRlConstructor = defaultOptions.defaultRlConstructor
 	o.maxEquivRedirects = defaultOptions.maxEquivRedirects
 
 	for _, opt := range options {
@@ -29,18 +25,6 @@ func NewOptions(
 func WithClient(opt *http.Client) OptOptionsSetter {
 	return func(o *Options) {
 		o.client = opt
-	}
-}
-
-func WithRateLimitMap(opt map[string]*rate.Limiter) OptOptionsSetter {
-	return func(o *Options) {
-		o.rateLimitMap = opt
-	}
-}
-
-func WithDefaultRlConstructor(opt func() *rate.Limiter) OptOptionsSetter {
-	return func(o *Options) {
-		o.defaultRlConstructor = opt
 	}
 }
 
