@@ -18,7 +18,7 @@ _{{.Group.SrcGroup.Description.Val}}_
 {{- end}}
 
 {{range .Group.Links -}}
-- [{{.Title}}]({{.SrcLink.URL}})
+- [{{.Title}}]({{.SrcLink.URL}}). Stars: {{.Facts.Data.Github.StargazersCount}}
 {{end}}
 
 {{- if .Group.Groups -}}
