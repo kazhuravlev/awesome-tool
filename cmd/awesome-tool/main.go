@@ -91,7 +91,7 @@ func helpCreateApp(c *cli.Context) (*app.App, error) {
 			return rate.NewLimiter(rate.Every(time.Second), 5)
 		}),
 		httph.WithRateLimitMap(map[string]*rate.Limiter{
-			"github.com": rate.NewLimiter(rate.Every(time.Second)/1, 2),
+			"github.com": rate.NewLimiter(rate.Every(time.Minute), 1),
 		}),
 	))
 	if err != nil {
@@ -124,6 +124,7 @@ func helpCreateApp(c *cli.Context) (*app.App, error) {
 					),
 				),
 			),
+		),
 		app.WithHttp(httpClient),
 		app.WithMaxWorkers(10),
 		app.WithSumEncoder(encoder),
